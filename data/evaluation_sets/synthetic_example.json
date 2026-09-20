@@ -1,0 +1,18 @@
+{
+  "name": "Synthetic local smoke test",
+  "provenance": "Hand-authored fixture for software verification; not a real model experiment. No latency or token measurements were collected.",
+  "data_kind": "synthetic",
+  "records": [
+    {
+      "id": "synthetic-capital-1",
+      "application_type": "rag",
+      "question": "What is the capital of France?",
+      "response": "Paris",
+      "repeated_responses": ["Paris", "paris"],
+      "instructions": ["Answer with the city name only."],
+      "context": [{"id": "fixture-source", "text": "The capital of France is Paris."}],
+      "reference_answer": "Paris",
+      "reference_provenance": "Hand-authored software test fixture"
+    }
+  ]
+}

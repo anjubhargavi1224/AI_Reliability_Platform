@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "id": "synthetic-grounding-example-001",
+  "application_type": "research",
+  "question": "What improvement did Model A achieve?",
+  "response": "Model A improved accuracy by 17% [1].",
+  "context": [
+    {
+      "id": "source-1",
+      "title": "Synthetic example source",
+      "text": "The authors found that Model A improved accuracy by 4%."
+    }
+  ],
+  "reference_answer": "Model A improved accuracy by 4%.",
+  "reference_provenance": "Manually authored synthetic example, based on source-1.",
+  "citations": [
+    {
+      "id": "citation-1",
+      "raw_text": "[1]",
+      "source_id": "source-1",
+      "claim_text": "Model A improved accuracy by 17%."
+    }
+  ],
+  "metadata": {
+    "application_name": "synthetic-fixture"
+  }
+}

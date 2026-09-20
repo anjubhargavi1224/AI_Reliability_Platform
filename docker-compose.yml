@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-reliability-api
+    command: ["uvicorn", "ai_reliability.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    environment:
+      - AI_RELIABILITY_CONFIG=configs/example.json
+      - AI_RELIABILITY_DB=data/results/platform.sqlite3
+      - AI_RELIABILITY_ALLOWED_ORIGINS=*
+    volumes:
+      - platform-data:/app/data/results
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-reliability-dashboard
+    command: ["streamlit", "run", "frontend/dashboard.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+    ports:
+      - "8501:8501"
+    environment:
+      - AI_RELIABILITY_API_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  platform-data:
+    driver: local

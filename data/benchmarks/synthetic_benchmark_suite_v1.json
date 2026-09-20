@@ -1,0 +1,672 @@
+{
+  "name": "Synthetic Evaluation Benchmark Suite v1",
+  "version": "1.0.0",
+  "description": "Deterministic multi-category benchmark suite for verifying platform evaluators against standardized synthetic test cases. These synthetic cases are human-authored software test fixtures and do not represent real-world model outputs or ground truth factual knowledge.",
+  "dataset_kind": "synthetic",
+  "cases": [
+    {
+      "case_id": "case-grounding-01",
+      "category": "grounding",
+      "description": "Fully aligned response claim with exact lexical and numeric match in evidence.",
+      "prompt": "What was the reported benchmark accuracy for Model A?",
+      "response": "Model A achieved 94.5% accuracy on the evaluation dataset.",
+      "context": [
+        {
+          "id": "src-grounding-01",
+          "text": "Model A achieved 94.5% accuracy on the evaluation dataset after fine-tuning."
+        }
+      ],
+      "citations": [],
+      "expected_annotations": {
+        "claim_evidence_alignment": {
+          "expected_status": "completed",
+          "expected_claim_alignment": "aligned",
+          "expected_finding_codes": ["claim_evidence_aligned"]
+        },
+        "percentage_presence": {
+          "expected_status": "completed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-grounding-02",
+      "category": "grounding",
+      "description": "Response introduces an unsupported numeric percentage value absent from evidence.",
+      "prompt": "What throughput improvement was measured?",
+      "response": "The new pipeline increased throughput by 45%.",
+      "context": [
+        {
+          "id": "src-grounding-02",
+          "text": "The new pipeline increased throughput by 10% under sustained load."
+        }
+      ],
+      "citations": [],
+      "expected_annotations": {
+        "percentage_presence": {
+          "expected_status": "completed",
+          "expected_finding_codes": ["percentage_not_in_context"]
+        },
+        "claim_evidence_alignment": {
+          "expected_status": "completed",
+          "expected_claim_alignment": "potentially_contradicted",
+          "expected_finding_codes": ["claim_potentially_contradicted"]
+        }
+      }
+    },
+    {
+      "case_id": "case-grounding-03",
+      "category": "grounding",
+      "description": "Topic terms overlap strongly but numeric percentage conflicts directly.",
+      "prompt": "What was the error reduction rate?",
+      "response": "The algorithm achieved an 80% error reduction rate.",
+      "context": [
+        {
+          "id": "src-grounding-03",
+          "text": "The algorithm achieved an 20% error reduction rate in the final ablation."
+        }
+      ],
+      "citations": [],
+      "expected_annotations": {
+        "claim_evidence_alignment": {
+          "expected_status": "completed",
+          "expected_claim_alignment": "potentially_contradicted",
+          "expected_finding_codes": ["claim_potentially_contradicted"]
+        }
+      }
+    },
+    {
+      "case_id": "case-grounding-04",
+      "category": "grounding",
+      "description": "Empty context supplied; grounding evaluators must cleanly abstain as not_assessed.",
+      "prompt": "What is the capital of France?",
+      "response": "Paris is the capital of France.",
+      "context": [],
+      "citations": [],
+      "expected_annotations": {
+        "percentage_presence": {
+          "expected_status": "not_assessed",
+          "expected_finding_codes": []
+        },
+        "claim_evidence_alignment": {
+          "expected_status": "not_assessed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-grounding-05",
+      "category": "grounding",
+      "description": "Citation specifically resolves to target source src-target.",
+      "prompt": "What latency optimization was achieved?",
+      "response": "The latency was reduced to 15ms according to src-target.",
+      "context": [
+        {
+          "id": "src-target",
+          "text": "The latency was reduced to 15ms after memory layout optimizations."
+        },
+        {
+          "id": "src-unrelated",
+          "text": "The disk storage requirement was reduced by 100MB."
+        }
+      ],
+      "citations": [
+        {
+          "id": "cit-target-01",
+          "raw_text": "according to src-target",
+          "source_id": "src-target"
+        }
+      ],
+      "expected_annotations": {
+        "claim_evidence_alignment": {
+          "expected_status": "completed",
+          "expected_claim_alignment": "aligned",
+          "expected_finding_codes": ["claim_evidence_aligned"]
+        }
+      }
+    },
+    {
+      "case_id": "case-grounding-06",
+      "category": "grounding",
+      "description": "Citation explicitly references wrong source src-wrong; evidence from src-valid is isolated.",
+      "prompt": "What latency optimization was achieved?",
+      "response": "The latency was reduced to 15ms according to src-wrong.",
+      "context": [
+        {
+          "id": "src-valid",
+          "text": "The latency was reduced to 15ms after memory layout optimizations."
+        },
+        {
+          "id": "src-wrong",
+          "text": "Database backup jobs run daily at midnight."
+        }
+      ],
+      "citations": [
+        {
+          "id": "cit-wrong-01",
+          "raw_text": "according to src-wrong",
+          "source_id": "src-wrong"
+        }
+      ],
+      "expected_annotations": {
+        "claim_evidence_alignment": {
+          "expected_status": "completed",
+          "expected_claim_alignment": "insufficient_evidence",
+          "expected_finding_codes": ["claim_insufficient_evidence"]
+        }
+      }
+    },
+    {
+      "case_id": "case-format-01",
+      "category": "instruction_following",
+      "description": "Response complies with explicit word limit requirement in prompt/instructions.",
+      "prompt": "Summarize the finding in under 10 words.",
+      "response": "The new compiler optimization reduced execution time significantly.",
+      "instructions": ["Keep the response under 10 words."],
+      "expected_annotations": {}
+    },
+    {
+      "case_id": "case-format-02",
+      "category": "instruction_following",
+      "description": "Response violates word limit in prompt/instructions.",
+      "prompt": "Give a one-word answer.",
+      "response": "This is a deliberately excessively verbose and lengthy response that far exceeds any reasonable short word limit threshold configured for instruction following verification.",
+      "instructions": ["Answer in one word only."],
+      "expected_annotations": {}
+    },
+    {
+      "case_id": "case-ref-01",
+      "category": "reference_matching",
+      "description": "Response exactly matches canonical reference answer.",
+      "prompt": "What is the capital of Japan?",
+      "response": "Tokyo",
+      "reference_answer": "Tokyo",
+      "reference_provenance": "Hand-authored geographic fixture",
+      "expected_annotations": {
+        "reference_match": {
+          "expected_status": "completed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-ref-02",
+      "category": "reference_matching",
+      "description": "Response provides a paraphrase differing from the normalized canonical reference.",
+      "prompt": "What is the speed of light?",
+      "response": "Approximately three hundred thousand kilometers per second.",
+      "reference_answer": "299,792,458 m/s",
+      "reference_provenance": "Physical constants table v1.0",
+      "expected_annotations": {
+        "reference_match": {
+          "expected_status": "completed",
+          "expected_finding_codes": ["reference_text_mismatch"]
+        }
+      }
+    },
+    {
+      "case_id": "case-ref-03",
+      "category": "reference_matching",
+      "description": "Reference answer is supplied without provenance; evaluator must abstain as not_assessed.",
+      "prompt": "What is the boiling point of water?",
+      "response": "100 C",
+      "expected_annotations": {
+        "reference_match": {
+          "expected_status": "not_assessed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-citation-01",
+      "category": "citation_structure",
+      "description": "Structured citation properly resolves to supplied context source ID.",
+      "prompt": "Provide the benchmark result with citation.",
+      "response": "The model reached 90% [src-101].",
+      "context": [
+        {
+          "id": "src-101",
+          "text": "Model accuracy reached 90% on GLUE."
+        }
+      ],
+      "citations": [
+        {
+          "id": "cit-01",
+          "raw_text": "[src-101]",
+          "source_id": "src-101"
+        }
+      ],
+      "expected_annotations": {
+        "citation_structure": {
+          "expected_status": "completed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-citation-02",
+      "category": "citation_structure",
+      "description": "Citation references absent source ID not present in context.",
+      "prompt": "Provide the result with citation.",
+      "response": "The model reached 90% [src-missing].",
+      "context": [
+        {
+          "id": "src-real",
+          "text": "Model accuracy reached 90% on GLUE."
+        }
+      ],
+      "citations": [
+        {
+          "id": "cit-02",
+          "raw_text": "[src-missing]",
+          "source_id": "src-missing"
+        }
+      ],
+      "expected_annotations": {
+        "citation_structure": {
+          "expected_status": "completed",
+          "expected_finding_codes": ["unresolved_source"]
+        }
+      }
+    },
+    {
+      "case_id": "case-consistency-01",
+      "category": "consistency",
+      "description": "Identical repeated generations produce 100% pairwise agreement.",
+      "prompt": "Name the primary colors.",
+      "response": "Red, Blue, Yellow",
+      "repeated_responses": [
+        "Red, Blue, Yellow",
+        "Red, Blue, Yellow"
+      ],
+      "expected_annotations": {
+        "repeated_response_consistency": {
+          "expected_status": "completed",
+          "expected_finding_codes": [],
+          "expected_measurements": {
+            "pair_count": 3
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-consistency-02",
+      "category": "consistency",
+      "description": "Differing repeated generations produce lower pairwise agreement.",
+      "prompt": "Provide a random greeting.",
+      "response": "Hello",
+      "repeated_responses": [
+        "Hi there",
+        "Greetings"
+      ],
+      "expected_annotations": {
+        "repeated_response_consistency": {
+          "expected_status": "completed",
+          "expected_finding_codes": [],
+          "expected_measurements": {
+            "pair_count": 3
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-perf-01",
+      "category": "performance",
+      "description": "Supplied response latency is within configured budget.",
+      "prompt": "Quick query.",
+      "response": "Instant answer.",
+      "metadata": {
+        "response_latency_ms": 120.0
+      },
+      "expected_annotations": {
+        "reported_performance": {
+          "expected_status": "completed",
+          "expected_finding_codes": [],
+          "expected_measurements": {
+            "response_latency_ms": 120.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-retrieval-01",
+      "category": "retrieval",
+      "description": "Perfect retrieval where single relevant source is retrieved at rank 1.",
+      "prompt": "What is the memory overhead of the new vector layout?",
+      "response": "The memory overhead is 12MB.",
+      "retrieved_source_ids": ["doc-layout-12", "doc-arch-01", "doc-intro-05"],
+      "relevant_source_ids": ["doc-layout-12"],
+      "expected_annotations": {
+        "rag_retrieval": {
+          "expected_status": "completed",
+          "expected_finding_codes": ["retrieval_hit", "retrieval_relevant_source_found"],
+          "expected_measurements": {
+            "hit_at_1": 1,
+            "hit_at_3": 1,
+            "hit_at_5": 1,
+            "recall_at_1": 1.0,
+            "recall_at_3": 1.0,
+            "recall_at_5": 1.0,
+            "precision_at_1": 1.0,
+            "reciprocal_rank": 1.0,
+            "first_relevant_rank": 1
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-retrieval-02",
+      "category": "retrieval",
+      "description": "Partial retrieval where one of two relevant sources is retrieved at rank 3.",
+      "prompt": "What database clustering algorithm was selected?",
+      "response": "Raft consensus was selected.",
+      "retrieved_source_ids": ["doc-intro-01", "doc-hardware-02", "doc-raft-09", "doc-bench-10"],
+      "relevant_source_ids": ["doc-raft-09", "doc-paxos-04"],
+      "expected_annotations": {
+        "rag_retrieval": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "retrieval_hit",
+            "retrieval_relevant_source_found",
+            "retrieval_relevant_source_missed"
+          ],
+          "expected_measurements": {
+            "hit_at_1": 0,
+            "hit_at_3": 1,
+            "hit_at_5": 1,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.5,
+            "recall_at_5": 0.5,
+            "reciprocal_rank": 0.3333,
+            "first_relevant_rank": 3
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-retrieval-03",
+      "category": "retrieval",
+      "description": "Complete retrieval miss where none of the retrieved documents are relevant.",
+      "prompt": "What security policy applies to internal microservices?",
+      "response": "mTLS is enforced on all endpoints.",
+      "retrieved_source_ids": ["doc-marketing-01", "doc-sales-02"],
+      "relevant_source_ids": ["doc-security-mtls", "doc-auth-token"],
+      "expected_annotations": {
+        "rag_retrieval": {
+          "expected_status": "completed",
+          "expected_finding_codes": ["retrieval_miss", "retrieval_relevant_source_missed"],
+          "expected_measurements": {
+            "hit_at_1": 0,
+            "hit_at_3": 0,
+            "hit_at_5": 0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "precision_at_1": 0.0,
+            "reciprocal_rank": 0.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-retrieval-04",
+      "category": "retrieval",
+      "description": "Missing relevant ground truth; evaluator cleanly abstains as not_assessed.",
+      "prompt": "What was the quarterly revenue growth?",
+      "response": "Revenue grew by 15%.",
+      "retrieved_source_ids": ["doc-fin-01", "doc-fin-02"],
+      "relevant_source_ids": null,
+      "expected_annotations": {
+        "rag_retrieval": {
+          "expected_status": "not_assessed",
+          "expected_finding_codes": []
+        }
+      }
+    },
+    {
+      "case_id": "case-retrieval-05",
+      "category": "retrieval",
+      "description": "Empty retrieved list evaluated against known relevant ground truth.",
+      "prompt": "What is the timeout threshold for connection pools?",
+      "response": "The timeout threshold is 5000ms.",
+      "retrieved_source_ids": [],
+      "relevant_source_ids": ["doc-pool-config"],
+      "expected_annotations": {
+        "rag_retrieval": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "retrieval_empty_results",
+            "retrieval_miss",
+            "retrieval_relevant_source_missed"
+          ],
+          "expected_measurements": {
+            "hit_at_1": 0,
+            "recall_at_1": 0.0,
+            "precision_at_1": 0.0,
+            "reciprocal_rank": 0.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-01",
+      "category": "agent",
+      "description": "Expected tool is called with correct arguments in execution trace.",
+      "prompt": "Find UK AI master's degree options.",
+      "response": "Found several UK AI master's programs.",
+      "tool_calls": [
+        {
+          "name": "search",
+          "arguments": {"query": "UK AI masters"},
+          "order": 1,
+          "status": "success",
+          "result": "Found 5 degree programs."
+        }
+      ],
+      "tool_trace_expectations": {
+        "expected_tools": ["search"],
+        "expected_arguments": {
+          "search": {"query": "UK AI masters"}
+        }
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_and_called",
+            "tool_argument_match"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 1,
+            "observed_tools_count": 1,
+            "expected_tools_called": 1,
+            "missing_expected_tools": 0,
+            "argument_matches": 1,
+            "argument_mismatches": 0,
+            "failed_tool_calls": 0,
+            "disallowed_tool_calls": 0,
+            "tool_selection_rate": 1.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-02",
+      "category": "agent",
+      "description": "Expected tool was required but completely omitted from execution trace.",
+      "prompt": "Look up the exchange rate for EUR to USD.",
+      "response": "The current rate is approximately 1.08.",
+      "tool_calls": [],
+      "tool_trace_expectations": {
+        "expected_tools": ["currency_converter"]
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_but_missing"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 1,
+            "observed_tools_count": 0,
+            "expected_tools_called": 0,
+            "missing_expected_tools": 1,
+            "tool_selection_rate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-03",
+      "category": "agent",
+      "description": "Tool called with mismatched arguments compared to explicit expectation.",
+      "prompt": "Find UK AI master's degree options.",
+      "response": "Found cybersecurity programs instead.",
+      "tool_calls": [
+        {
+          "name": "search",
+          "arguments": {"query": "UK cybersecurity masters"},
+          "order": 1,
+          "status": "success"
+        }
+      ],
+      "tool_trace_expectations": {
+        "expected_tools": ["search"],
+        "expected_arguments": {
+          "search": {"query": "UK AI masters"}
+        }
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_and_called",
+            "tool_argument_mismatch"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 1,
+            "observed_tools_count": 1,
+            "expected_tools_called": 1,
+            "argument_matches": 0,
+            "argument_mismatches": 1,
+            "tool_selection_rate": 1.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-04",
+      "category": "agent",
+      "description": "Tool call sequence executed in reverse order of explicit expectation.",
+      "prompt": "Search for sales data then calculate quarterly total.",
+      "response": "Calculated total from searched data.",
+      "tool_calls": [
+        {
+          "name": "calculator",
+          "arguments": {"expr": "100+200"},
+          "order": 1,
+          "status": "success"
+        },
+        {
+          "name": "search",
+          "arguments": {"query": "Q3 sales"},
+          "order": 2,
+          "status": "success"
+        }
+      ],
+      "tool_trace_expectations": {
+        "expected_tools": ["search", "calculator"],
+        "expected_tool_order": ["search", "calculator"]
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_and_called",
+            "tool_order_mismatch"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 2,
+            "observed_tools_count": 2,
+            "order_match": 0,
+            "tool_selection_rate": 1.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-05",
+      "category": "agent",
+      "description": "Agent executed an unnecessary tool that was explicitly marked as disallowed.",
+      "prompt": "Find public documentation for the database driver.",
+      "response": "Found documentation and also sent an email.",
+      "tool_calls": [
+        {
+          "name": "search",
+          "arguments": {"query": "db driver docs"},
+          "order": 1,
+          "status": "success"
+        },
+        {
+          "name": "send_email",
+          "arguments": {"recipient": "admin@example.com"},
+          "order": 2,
+          "status": "success"
+        }
+      ],
+      "tool_trace_expectations": {
+        "expected_tools": ["search"],
+        "disallowed_tools": ["send_email"]
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_and_called",
+            "unnecessary_tool_call"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 1,
+            "observed_tools_count": 2,
+            "disallowed_tool_calls": 1,
+            "tool_selection_rate": 1.0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "case-agent-06",
+      "category": "agent",
+      "description": "Tool call failed at runtime with error status in execution trace.",
+      "prompt": "Check health of the backend microservice cluster.",
+      "response": "Failed to reach health endpoint.",
+      "tool_calls": [
+        {
+          "name": "health_check",
+          "arguments": {"host": "cluster-1.internal"},
+          "order": 1,
+          "status": "error",
+          "error_message": "HTTP 503 Service Unavailable"
+        }
+      ],
+      "tool_trace_expectations": {
+        "expected_tools": ["health_check"]
+      },
+      "expected_annotations": {
+        "agent_tool_trace": {
+          "expected_status": "completed",
+          "expected_finding_codes": [
+            "tool_expected_and_called",
+            "tool_call_failed"
+          ],
+          "expected_measurements": {
+            "expected_tools_count": 1,
+            "observed_tools_count": 1,
+            "failed_tool_calls": 1,
+            "tool_selection_rate": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

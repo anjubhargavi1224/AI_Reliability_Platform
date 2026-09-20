@@ -1,0 +1,87 @@
+{
+  "name": "SYNTHETIC paired verification - corrected",
+  "provenance": "Hand-authored software verification fixtures, not real model experiments. All responses, repeated responses and supplied latency values are synthetic; no model calls or model performance measurements were made.",
+  "data_kind": "synthetic",
+  "records": [
+    {
+      "application_type": "rag",
+      "metadata": {
+        "application_name": "Synthetic paired verification fixture",
+        "model": "hand-authored-fixture",
+        "captured_at": "2026-09-14T12:00:00Z"
+      },
+      "id": "paired-percentage",
+      "question": "What growth rate is stated in the supplied evidence?",
+      "context": [
+        {
+          "id": "growth-fixture",
+          "text": "Synthetic source: the growth rate was 4%."
+        }
+      ],
+      "instructions": [
+        "State the supplied growth rate in no more than 100 words."
+      ],
+      "response": "The growth rate was 4%."
+    },
+    {
+      "application_type": "llm",
+      "metadata": {
+        "application_name": "Synthetic paired verification fixture",
+        "model": "hand-authored-fixture",
+        "captured_at": "2026-09-14T12:00:00Z"
+      },
+      "id": "paired-reference",
+      "question": "What is the capital of France?",
+      "reference_answer": "Paris",
+      "reference_provenance": "Hand-authored synthetic reference for software verification.",
+      "instructions": [
+        "Answer with the city name in no more than 100 words."
+      ],
+      "response": "Paris"
+    },
+    {
+      "application_type": "llm",
+      "metadata": {
+        "application_name": "Synthetic paired verification fixture",
+        "model": "hand-authored-fixture",
+        "captured_at": "2026-09-14T12:00:00Z"
+      },
+      "id": "paired-format",
+      "question": "Give a brief acknowledgement.",
+      "instructions": [
+        "Use no more than 100 words."
+      ],
+      "response": "Acknowledged."
+    },
+    {
+      "application_type": "llm",
+      "metadata": {
+        "application_name": "Synthetic paired verification fixture",
+        "model": "hand-authored-fixture",
+        "captured_at": "2026-09-14T12:00:00Z",
+        "response_latency_ms": 1500
+      },
+      "id": "paired-latency",
+      "question": "Acknowledge this synthetic request.",
+      "response": "Acknowledged."
+    },
+    {
+      "application_type": "llm",
+      "metadata": {
+        "application_name": "Synthetic paired verification fixture",
+        "model": "hand-authored-fixture",
+        "captured_at": "2026-09-14T12:00:00Z"
+      },
+      "id": "paired-consistency",
+      "question": "What is the capital of France?",
+      "instructions": [
+        "Answer with the city name in no more than 100 words."
+      ],
+      "response": "Paris",
+      "repeated_responses": [
+        "Paris",
+        "paris"
+      ]
+    }
+  ]
+}

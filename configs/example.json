@@ -1,0 +1,14 @@
+{
+  "judge": {
+    "enabled": false,
+    "provider": "openai",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "endpoint_env": "LLM_JUDGE_URL",
+    "api_key_env": "OPENAI_API_KEY",
+    "timeout_seconds": 30.0,
+    "max_output_tokens": 1000
+  },
+  "format": {"max_words": 100, "require_json": false},
+  "performance": {"response_latency_budget_ms": 2000.0},
+  "require_citations": false
+}
