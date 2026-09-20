@@ -28,12 +28,26 @@ st.set_page_config(
 )
 
 # Load Robot Hero Base64 image
-ROBOT_IMAGE_PATH = Path(__file__).parent / "assets" / "verity_robot_hero.png"
-if ROBOT_IMAGE_PATH.exists():
-    with open(ROBOT_IMAGE_PATH, "rb") as f:
-        ROBOT_B64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
-else:
-    ROBOT_B64 = ""
+CANDIDATE_ROBOT_PATHS = [
+    Path(__file__).resolve().parent / "assets" / "verity_robot_hero.png",
+    Path(__file__).resolve().parent / "static" / "verity_robot.png",
+    ROOT_DIR / "static" / "verity_robot.png",
+    ROOT_DIR / "frontend" / "assets" / "verity_robot_hero.png",
+    Path("static/verity_robot.png"),
+    Path("frontend/assets/verity_robot_hero.png"),
+]
+
+ROBOT_B64 = ""
+for p in CANDIDATE_ROBOT_PATHS:
+    if p.exists() and p.is_file():
+        try:
+            with open(p, "rb") as f:
+                ROBOT_B64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+            if ROBOT_B64:
+                break
+        except Exception:
+            continue
+
 
 # Cinematic Design: Deep Burgundy (#59171B), Warm Peach (#FED7B8), Rose/Wine (#8B263E, #C45564), Near-Black (#0E0406)
 st.markdown(
@@ -41,8 +55,26 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
     html {
         scroll-behavior: smooth;
+        max-width: 100vw;
+        overflow-x: clip;
+    }
+
+    body, [data-testid="stAppViewContainer"], .main, .stApp {
+        max-width: 100vw !important;
+        overflow-x: clip !important;
+        box-sizing: border-box !important;
+    }
+
+    @supports not (overflow-x: clip) {
+        html, body, [data-testid="stAppViewContainer"], .main, .stApp {
+            overflow-x: hidden !important;
+        }
     }
 
     html, body, [class*="css"] {
@@ -51,6 +83,15 @@ st.markdown(
 
     code, pre, [data-testid="stCode"] {
         font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 3rem !important;
+        padding-left: clamp(0.75rem, 3vw, 2.5rem) !important;
+        padding-right: clamp(0.75rem, 3vw, 2.5rem) !important;
+        max-width: 1240px !important;
+        margin: 0 auto !important;
     }
 
     /* Cinematic Deep Burgundy / Near-Black Background with Atmospheric Depth */
@@ -71,38 +112,42 @@ st.markdown(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 14px 28px;
+        padding: 12px 24px;
         margin-bottom: 12px;
         border-bottom: 1px solid rgba(254, 215, 184, 0.1);
         backdrop-filter: blur(16px);
-        background: rgba(14, 4, 6, 0.45);
+        background: rgba(14, 4, 6, 0.55);
         border-radius: 16px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .verity-brand {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 1.15rem;
+        gap: 8px;
+        font-size: clamp(0.95rem, 2.5vw, 1.15rem);
         font-weight: 800;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         color: #FFFFFF;
         text-transform: uppercase;
+        white-space: nowrap;
     }
     .verity-brand-mark {
         color: #FED7B8;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         filter: drop-shadow(0 0 8px rgba(254, 215, 184, 0.6));
     }
     .verity-nav-links {
         display: flex;
-        gap: 28px;
-        font-size: 0.92rem;
+        gap: clamp(12px, 2vw, 28px);
+        font-size: clamp(0.82rem, 1.8vw, 0.92rem);
         font-weight: 500;
         color: #D6ADA0;
     }
     .verity-nav-links span {
         cursor: pointer;
         transition: color 0.2s ease;
+        white-space: nowrap;
     }
     .verity-nav-links span:hover, .verity-nav-links span.active {
         color: #FED7B8;
@@ -110,9 +155,9 @@ st.markdown(
     .verity-nav-cta {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
         color: #2D080C !important;
-        font-size: 0.85rem;
+        font-size: clamp(0.75rem, 1.8vw, 0.85rem);
         font-weight: 700;
-        padding: 8px 18px;
+        padding: 7px 16px;
         border-radius: 24px;
         letter-spacing: 0.02em;
         box-shadow: 0 4px 16px rgba(254, 215, 184, 0.2);
@@ -120,6 +165,7 @@ st.markdown(
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         display: inline-block;
+        white-space: nowrap;
     }
     .verity-nav-cta:hover, .verity-nav-cta:focus {
         box-shadow: 0 6px 24px rgba(254, 215, 184, 0.45);
@@ -130,15 +176,17 @@ st.markdown(
     /* Cinematic Hero Layout with Giant Background Typography & Robot */
     .hero-wrapper {
         position: relative;
-        padding: 20px 0 30px 0;
+        padding: 16px 0 24px 0;
         overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
     }
     .hero-giant-bg-text-top {
         position: absolute;
         top: 2%;
         left: 50%;
         transform: translateX(-50%);
-        font-size: clamp(3.5rem, 8.5vw, 7.8rem);
+        font-size: clamp(2.4rem, 7.5vw, 7.8rem);
         font-weight: 800;
         color: rgba(255, 255, 255, 0.9);
         letter-spacing: -0.04em;
@@ -146,19 +194,23 @@ st.markdown(
         pointer-events: none;
         z-index: 1;
         text-shadow: 0 0 40px rgba(254, 215, 184, 0.2);
+        max-width: 100%;
+        overflow: hidden;
     }
     .hero-giant-bg-text-bottom {
         position: absolute;
         top: 22%;
         left: 50%;
         transform: translateX(-50%);
-        font-size: clamp(3.5rem, 8.5vw, 7.8rem);
+        font-size: clamp(2.4rem, 7.5vw, 7.8rem);
         font-weight: 800;
         color: rgba(254, 215, 184, 0.12);
         letter-spacing: -0.04em;
         white-space: nowrap;
         pointer-events: none;
         z-index: 1;
+        max-width: 100%;
+        overflow: hidden;
     }
     .hero-composition {
         position: relative;
@@ -168,10 +220,13 @@ st.markdown(
         min-height: 440px;
         z-index: 2;
         gap: 20px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .hero-left-content {
-        padding-top: 20px;
+        padding-top: 10px;
         z-index: 3;
+        width: 100%;
     }
     .hero-eyebrow {
         font-size: 0.76rem;
@@ -183,12 +238,13 @@ st.markdown(
         display: inline-block;
     }
     .hero-main-title {
-        font-size: clamp(2.4rem, 4.2vw, 3.8rem);
+        font-size: clamp(2.2rem, 4vw, 3.8rem);
         font-weight: 800;
         color: #FFFFFF;
         line-height: 1.12;
         letter-spacing: -0.04em;
         margin: 0 0 16px 0;
+        word-break: break-word;
     }
     .hero-main-title span.gradient-text {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%);
@@ -196,7 +252,7 @@ st.markdown(
         -webkit-text-fill-color: transparent;
     }
     .hero-description {
-        font-size: 1.05rem;
+        font-size: clamp(0.92rem, 1.8vw, 1.05rem);
         color: #E2C2B2;
         line-height: 1.55;
         margin: 0 0 24px 0;
@@ -206,7 +262,8 @@ st.markdown(
     .hero-buttons {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
+        flex-wrap: wrap;
     }
     .hero-btn-primary {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%);
@@ -222,6 +279,7 @@ st.markdown(
         gap: 8px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
     }
     .hero-btn-primary:hover, .hero-btn-primary:focus {
         background: linear-gradient(135deg, #FFFFFF 0%, #FED7B8 50%, #D87B85 100%) !important;
@@ -243,6 +301,7 @@ st.markdown(
         text-decoration: none !important;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
     }
     .hero-btn-secondary:hover, .hero-btn-secondary:focus {
         background: rgba(254, 215, 184, 0.15) !important;
@@ -258,22 +317,27 @@ st.markdown(
         align-items: center;
         position: relative;
         z-index: 2;
+        width: 100%;
     }
     .robot-glow-aura {
         position: absolute;
-        width: 320px;
-        height: 320px;
+        width: clamp(200px, 32vw, 320px);
+        height: clamp(200px, 32vw, 320px);
         background: radial-gradient(circle, rgba(254, 215, 184, 0.28) 0%, rgba(89, 23, 27, 0.45) 45%, transparent 70%);
         border-radius: 50%;
         filter: blur(28px);
         z-index: -1;
+        pointer-events: none;
     }
     .robot-img {
         max-width: 100%;
         height: auto;
         max-height: 420px;
+        object-fit: contain;
         filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 25px rgba(89, 23, 27, 0.4));
         user-select: none;
+        display: block;
+        margin: 0 auto;
     }
 
     /* Floating Metric Badges on Right of Hero */
@@ -282,8 +346,9 @@ st.markdown(
         flex-direction: column;
         gap: 14px;
         align-items: flex-start;
-        padding-left: 20px;
+        padding-left: 10px;
         z-index: 3;
+        width: 100%;
     }
     .hero-metric-tag {
         font-size: 0.72rem;
@@ -301,6 +366,7 @@ st.markdown(
         backdrop-filter: blur(14px);
         min-width: 130px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        box-sizing: border-box;
     }
     .hero-metric-number {
         font-size: 1.8rem;
@@ -320,31 +386,34 @@ st.markdown(
         background: rgba(24, 7, 11, 0.65);
         border: 1px solid rgba(254, 215, 184, 0.18);
         border-radius: 20px;
-        padding: 26px 30px;
+        padding: clamp(16px, 3.5vw, 26px);
         margin: 10px auto 36px auto;
         backdrop-filter: blur(20px);
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(254, 215, 184, 0.15);
+        width: 100%;
+        box-sizing: border-box;
     }
     .console-header {
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
     .console-header-icon {
         color: #FED7B8;
         font-size: 1.25rem;
     }
     .console-title {
-        font-size: 1.25rem;
+        font-size: clamp(1.1rem, 2.5vw, 1.25rem);
         font-weight: 700;
         color: #FFFFFF;
         margin: 0;
     }
     .console-subtitle {
-        font-size: 0.88rem;
+        font-size: clamp(0.8rem, 1.8vw, 0.88rem);
         color: #D6ADA0;
-        margin-left: 6px;
+        margin-left: 4px;
     }
 
     /* Input Fields */
@@ -355,6 +424,9 @@ st.markdown(
         margin: 0 0 6px 0;
         letter-spacing: -0.01em;
     }
+    .stTextArea, .stTextInput {
+        width: 100% !important;
+    }
     .stTextArea textarea, .stTextInput input {
         background: rgba(12, 3, 5, 0.75) !important;
         border: 1px solid rgba(254, 215, 184, 0.16) !important;
@@ -362,6 +434,8 @@ st.markdown(
         color: #FFF5EE !important;
         font-size: 0.96rem !important;
         transition: all 0.25s ease !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .stTextArea textarea:focus, .stTextInput input:focus {
         border-color: #FED7B8 !important;
@@ -375,12 +449,13 @@ st.markdown(
         color: #2D080C !important;
         border: none !important;
         font-weight: 800 !important;
-        font-size: 1.05rem !important;
+        font-size: clamp(0.92rem, 2vw, 1.05rem) !important;
         letter-spacing: 0.02em !important;
         border-radius: 12px !important;
-        padding: 14px 34px !important;
+        padding: 13px 28px !important;
         box-shadow: 0 6px 24px rgba(254, 215, 184, 0.28) !important;
         transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        width: 100% !important;
     }
     button[kind="primary"]:hover, .stButton > button:hover {
         background: linear-gradient(135deg, #FFFFFF 0%, #FED7B8 50%, #D87B85 100%) !important;
@@ -395,18 +470,22 @@ st.markdown(
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         margin: 20px 0 50px 0;
+        width: 100%;
+        box-sizing: border-box;
     }
     .feature-card {
         background: rgba(24, 7, 11, 0.55);
         border: 1px solid rgba(254, 215, 184, 0.12);
         border-radius: 18px;
-        padding: 26px 24px;
+        padding: clamp(18px, 3vw, 26px) clamp(16px, 2.5vw, 24px);
         transition: all 0.25s ease;
         backdrop-filter: blur(14px);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         min-height: 250px;
+        box-sizing: border-box;
+        width: 100%;
     }
     .feature-card:hover {
         border-color: rgba(254, 215, 184, 0.3);
@@ -422,13 +501,14 @@ st.markdown(
         justify-content: center;
     }
     .feature-title {
-        font-size: 1.12rem;
+        font-size: clamp(1rem, 2vw, 1.12rem);
         font-weight: 700;
         color: #FFFFFF;
         margin-bottom: 8px;
+        word-break: break-word;
     }
     .feature-desc {
-        font-size: 0.9rem;
+        font-size: clamp(0.84rem, 1.6vw, 0.9rem);
         color: #D6ADA0;
         line-height: 1.5;
         margin-bottom: 18px;
@@ -450,22 +530,28 @@ st.markdown(
 
     /* "From AI Answer to Evidence" Section */
     .process-section {
-        margin: 40px 0 60px 0;
-        padding-top: 20px;
+        margin: 36px 0 50px 0;
+        padding-top: 10px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .process-header-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         align-items: flex-end;
-        margin-bottom: 32px;
+        margin-bottom: 28px;
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .process-main-heading {
-        font-size: 2.6rem;
+        font-size: clamp(1.9rem, 4vw, 2.6rem);
         font-weight: 800;
         color: #FFFFFF;
         line-height: 1.15;
         letter-spacing: -0.03em;
         margin: 0;
+        word-break: break-word;
     }
     .process-main-heading span.gradient-text {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
@@ -473,7 +559,7 @@ st.markdown(
         -webkit-text-fill-color: transparent;
     }
     .process-subtext {
-        font-size: 1.02rem;
+        font-size: clamp(0.88rem, 1.8vw, 1.02rem);
         color: #D6ADA0;
         line-height: 1.5;
         margin: 0 0 10px 0;
@@ -493,14 +579,18 @@ st.markdown(
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
         position: relative;
+        width: 100%;
+        box-sizing: border-box;
     }
     .process-step-card {
         background: rgba(24, 7, 11, 0.55);
         border: 1px solid rgba(254, 215, 184, 0.12);
         border-radius: 16px;
-        padding: 22px 18px;
+        padding: clamp(16px, 2.5vw, 22px) clamp(14px, 2vw, 18px);
         backdrop-filter: blur(12px);
         transition: all 0.22s ease;
+        box-sizing: border-box;
+        width: 100%;
     }
     .process-step-card:hover {
         border-color: rgba(254, 215, 184, 0.3);
@@ -531,13 +621,13 @@ st.markdown(
         color: #FED7B8;
     }
     .step-title {
-        font-size: 1.15rem;
+        font-size: clamp(1rem, 2vw, 1.15rem);
         font-weight: 700;
         color: #FFFFFF;
         margin-bottom: 6px;
     }
     .step-desc {
-        font-size: 0.86rem;
+        font-size: clamp(0.82rem, 1.6vw, 0.86rem);
         color: #D6ADA0;
         line-height: 1.45;
         margin: 0;
@@ -549,25 +639,37 @@ st.markdown(
         border: 1px solid rgba(254, 215, 184, 0.18);
         border-top: 3px solid #FED7B8;
         border-radius: 16px;
-        padding: 24px 28px;
+        padding: clamp(16px, 3.5vw, 28px);
         margin: 20px 0;
         backdrop-filter: blur(16px);
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
     .q-and-a-card {
         background: rgba(24, 7, 11, 0.65);
         border: 1px solid rgba(254, 215, 184, 0.12);
         border-radius: 14px;
-        padding: 18px 22px;
+        padding: clamp(14px, 3vw, 22px);
         margin-bottom: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
     .claim-card {
         background: rgba(30, 9, 13, 0.7);
         border: 1px solid rgba(254, 215, 184, 0.12);
         border-radius: 14px;
-        padding: 18px 22px;
+        padding: clamp(14px, 3vw, 22px);
         margin-bottom: 14px;
         backdrop-filter: blur(12px);
+        width: 100%;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
     .claim-card-supported {
         border-left: 4px solid #22C55E;
@@ -617,14 +719,20 @@ st.markdown(
         background: rgba(24, 7, 11, 0.65);
         border: 1px solid rgba(254, 215, 184, 0.12);
         border-radius: 14px;
-        padding: 16px 20px;
+        padding: clamp(14px, 3vw, 20px);
         margin-bottom: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
     .source-title {
         color: #FED7B8;
         font-weight: 700;
         text-decoration: none;
         font-size: 0.96rem;
+        word-break: break-all;
+        overflow-wrap: anywhere;
     }
     .source-title:hover {
         color: #FFFFFF;
@@ -641,6 +749,7 @@ st.markdown(
         border-radius: 10px !important;
         padding: 10px 22px !important;
         transition: all 0.2s ease !important;
+        max-width: 100% !important;
     }
     .stDownloadButton > button:hover {
         background: rgba(254, 215, 184, 0.18) !important;
@@ -657,29 +766,306 @@ st.markdown(
     [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
         color: #E2C2B2 !important;
     }
+
+    /* ------------------------------------------------------------- */
+    /* RESPONSIVE MEDIA QUERIES (DESKTOP, LAPTOP, TABLET, MOBILE)    */
+    /* ------------------------------------------------------------- */
+
+    /* Tablet & Medium Laptops (769px to 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        .hero-composition {
+            grid-template-columns: 1.15fr 1fr;
+            gap: 16px;
+            min-height: auto;
+        }
+        .hero-robot-center {
+            order: 2;
+        }
+        .robot-img {
+            max-height: 350px;
+        }
+        .hero-right-metrics {
+            grid-column: 1 / -1;
+            order: 3;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            padding-left: 0;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .hero-metric-tag {
+            width: 100%;
+        }
+        .hero-metric-pill {
+            flex: 1 1 140px;
+            min-width: 130px;
+        }
+        .feature-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .process-steps-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+    }
+
+    /* Mobile & Small Tablets (<= 768px) */
+    @media (max-width: 768px) {
+        .verity-nav {
+            padding: 10px 16px;
+            gap: 10px;
+        }
+        .verity-nav-links {
+            gap: 14px;
+        }
+        .hero-wrapper {
+            padding: 8px 0 16px 0;
+        }
+        .hero-giant-bg-text-top {
+            font-size: clamp(1.8rem, 8vw, 3.4rem);
+            top: 0;
+        }
+        .hero-giant-bg-text-bottom {
+            display: none;
+        }
+        .hero-composition {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+            min-height: auto;
+            width: 100%;
+        }
+        .hero-left-content {
+            text-align: center;
+            max-width: 100%;
+            padding-top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-main-title {
+            font-size: clamp(1.9rem, 7.5vw, 2.6rem);
+            line-height: 1.18;
+            margin-bottom: 12px;
+        }
+        .hero-description {
+            margin: 0 auto 20px auto;
+            font-size: 0.95rem;
+            max-width: 100%;
+        }
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+        .hero-btn-primary, .hero-btn-secondary {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+            padding: 12px 20px;
+            font-size: 0.92rem;
+        }
+        .hero-robot-center {
+            order: 2;
+            width: 100%;
+            margin: 10px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .robot-img {
+            max-height: 270px;
+            max-width: 80%;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .robot-glow-aura {
+            width: 220px;
+            height: 220px;
+            filter: blur(20px);
+        }
+        .hero-right-metrics {
+            order: 3;
+            padding-left: 0;
+            width: 100%;
+            max-width: 360px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+        .hero-metric-tag {
+            width: 100%;
+            text-align: center;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+        }
+        .hero-metric-pill {
+            flex: 1 1 130px;
+            min-width: 110px;
+            padding: 10px 14px;
+            text-align: center;
+            border-radius: 12px;
+        }
+        .hero-metric-number {
+            font-size: 1.5rem;
+        }
+        .hero-metric-label {
+            font-size: 0.72rem;
+        }
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin: 16px 0 36px 0;
+        }
+        .feature-card {
+            min-height: auto;
+        }
+        .process-section {
+            margin: 28px 0 40px 0;
+        }
+        .process-header-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .process-steps-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+
+    /* Small Mobile Phones (<= 480px, e.g. 375px, 390px) */
+    @media (max-width: 480px) {
+        .verity-nav {
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+        .verity-nav-links {
+            display: none;
+        }
+        .verity-brand {
+            font-size: 0.95rem;
+        }
+        .verity-nav-cta {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+        .hero-main-title {
+            font-size: 1.85rem;
+        }
+        .hero-description {
+            font-size: 0.88rem;
+        }
+        .hero-buttons {
+            max-width: 100%;
+        }
+        .hero-btn-primary, .hero-btn-secondary {
+            font-size: 0.88rem;
+            padding: 11px 16px;
+        }
+        .robot-img {
+            max-height: 220px;
+            max-width: 85%;
+        }
+        .robot-glow-aura {
+            width: 180px;
+            height: 180px;
+            filter: blur(16px);
+        }
+        .hero-right-metrics {
+            max-width: 100%;
+            gap: 8px;
+        }
+        .hero-metric-pill {
+            flex: 1 1 100px;
+            min-width: 90px;
+            padding: 8px 10px;
+        }
+        .hero-metric-number {
+            font-size: 1.35rem;
+        }
+        .hero-metric-label {
+            font-size: 0.68rem;
+        }
+        .process-main-heading {
+            font-size: 1.75rem;
+        }
+        .process-subtext {
+            font-size: 0.88rem;
+        }
+        .checker-console {
+            padding: 14px 12px;
+        }
+    }
+
+    /* Narrow Mobile (<= 360px, e.g. 320px) */
+    @media (max-width: 360px) {
+        .block-container {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        .verity-brand {
+            font-size: 0.88rem;
+        }
+        .verity-nav-cta {
+            padding: 5px 10px;
+            font-size: 0.72rem;
+        }
+        .hero-main-title {
+            font-size: 1.6rem;
+        }
+        .hero-description {
+            font-size: 0.84rem;
+        }
+        .hero-btn-primary, .hero-btn-secondary {
+            font-size: 0.82rem;
+            padding: 10px 14px;
+        }
+        .robot-img {
+            max-height: 190px;
+            max-width: 90%;
+        }
+        .robot-glow-aura {
+            width: 150px;
+            height: 150px;
+            filter: blur(14px);
+        }
+        .hero-metric-pill {
+            flex: 1 1 80px;
+            min-width: 75px;
+            padding: 6px 8px;
+        }
+        .hero-metric-number {
+            font-size: 1.2rem;
+        }
+        .hero-metric-label {
+            font-size: 0.64rem;
+        }
+        .process-main-heading {
+            font-size: 1.5rem;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 BASE_URL = os.getenv("AI_RELIABILITY_API_URL", "http://127.0.0.1:8000")
-_in_process_client = None
-
-
-def get_in_process_client():
-    global _in_process_client
-    if _in_process_client is None:
-        try:
-            from fastapi.testclient import TestClient
-            from ai_reliability.api import create_app
-            _in_process_client = TestClient(create_app())
-        except Exception:
-            pass
-    return _in_process_client
 
 
 def api(method: str, path: str, **kwargs):
-    """Execute HTTP request against the backend API with automatic in-process fallback for cloud hosting."""
     try:
         response = httpx.request(method, f"{BASE_URL}{path}", timeout=30.0, **kwargs)
         if response.status_code >= 400:
@@ -687,20 +1073,9 @@ def api(method: str, path: str, **kwargs):
             return None
         return response
     except httpx.RequestError:
-        client = get_in_process_client()
-        if client is not None:
-            try:
-                func = getattr(client, method.lower())
-                response = func(path, **kwargs)
-                if response.status_code >= 400:
-                    st.error(f"API error ({response.status_code}): {response.text}")
-                    return None
-                return response
-            except Exception as exc:
-                st.error(f"In-process engine error: {exc}")
-                return None
         st.error(f"Could not connect to API server at {BASE_URL}. Ensure the backend is running.")
         return None
+
 
 
 # Fetch System Health silently
