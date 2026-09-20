@@ -85,6 +85,25 @@ st.markdown(
         font-family: 'JetBrains Mono', monospace !important;
     }
 
+    /* Completely hide Streamlit default header, toolbar, fork/deploy buttons, and footer */
+    #MainMenu, 
+    header, 
+    footer, 
+    header[data-testid="stHeader"], 
+    [data-testid="stToolbar"], 
+    [data-testid="stDecoration"], 
+    [data-testid="stStatusWidget"],
+    .stDeployButton,
+    div[class*="viewerBadge"],
+    div[class*="stAppHeader"],
+    div[class*="_viewerBadge_"] {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
     .block-container {
         padding-top: 1rem !important;
         padding-bottom: 3rem !important;
@@ -120,6 +139,8 @@ st.markdown(
         border-radius: 16px;
         width: 100%;
         box-sizing: border-box;
+        position: relative;
+        z-index: 100;
     }
     .verity-brand {
         display: flex;
