@@ -31,6 +31,10 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+    html {
+        scroll-behavior: smooth;
+    }
+
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
@@ -95,13 +99,22 @@ st.markdown(
     }
     .verity-nav-cta {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
-        color: #2D080C;
+        color: #2D080C !important;
         font-size: 0.85rem;
         font-weight: 700;
         padding: 8px 18px;
         border-radius: 24px;
         letter-spacing: 0.02em;
         box-shadow: 0 4px 16px rgba(254, 215, 184, 0.2);
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-block;
+    }
+    .verity-nav-cta:hover, .verity-nav-cta:focus {
+        box-shadow: 0 6px 24px rgba(254, 215, 184, 0.45);
+        transform: translateY(-2px);
+        color: #1A0407 !important;
     }
 
     /* Cinematic Hero Layout with Giant Background Typography & Robot */
@@ -187,20 +200,28 @@ st.markdown(
     }
     .hero-btn-primary {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%);
-        color: #2D080C;
+        color: #2D080C !important;
         font-weight: 800;
         font-size: 0.95rem;
         padding: 12px 24px;
         border-radius: 28px;
-        text-decoration: none;
+        text-decoration: none !important;
         box-shadow: 0 6px 20px rgba(254, 215, 184, 0.3);
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        cursor: pointer;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-btn-primary:hover, .hero-btn-primary:focus {
+        background: linear-gradient(135deg, #FFFFFF 0%, #FED7B8 50%, #D87B85 100%) !important;
+        box-shadow: 0 8px 30px rgba(254, 215, 184, 0.45);
+        transform: translateY(-2px);
+        color: #1A0407 !important;
     }
     .hero-btn-secondary {
         background: rgba(254, 215, 184, 0.06);
-        color: #FED7B8;
+        color: #FED7B8 !important;
         font-weight: 600;
         font-size: 0.92rem;
         padding: 11px 22px;
@@ -209,6 +230,15 @@ st.markdown(
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-btn-secondary:hover, .hero-btn-secondary:focus {
+        background: rgba(254, 215, 184, 0.15) !important;
+        border-color: #FED7B8 !important;
+        color: #FFFFFF !important;
+        transform: translateY(-2px);
     }
 
     /* Centered Robot Visual in Hero */
@@ -682,9 +712,9 @@ if nav_page == "Check Answer":
                 <span>History</span>
                 <span>Advanced</span>
             </div>
-            <div class="verity-nav-cta">
+            <a href="#ask-verity-console" class="verity-nav-cta">
                 Get Started →
-            </div>
+            </a>
         </div>
         """,
         unsafe_allow_html=True,
@@ -708,8 +738,8 @@ if nav_page == "Check Answer":
                         Verity AI checks AI-generated answers against real evidence and shows you exactly what is supported, uncertain, or contradicted.
                     </p>
                     <div class="hero-buttons">
-                        <span class="hero-btn-primary">Check an AI Answer →</span>
-                        <span class="hero-btn-secondary">▷ How It Works</span>
+                        <a href="#ask-verity-console" class="hero-btn-primary">Check an AI Answer →</a>
+                        <a href="#how-it-works-section" class="hero-btn-secondary">▷ How It Works</a>
                     </div>
                 </div>
                 <div class="hero-robot-center">
@@ -736,6 +766,7 @@ if nav_page == "Check Answer":
     # Main Checker Interaction Console ("Ask Verity")
     st.markdown(
         """
+        <div id="ask-verity-console" style="scroll-margin-top: 24px;"></div>
         <div class="console-header" style="margin-top: 20px;">
             <span class="console-header-icon">✦</span>
             <h2 class="console-title">Ask Verity</h2>
@@ -843,21 +874,21 @@ if nav_page == "Check Answer":
         unsafe_allow_html=True,
     )
 
-    # "From AI Answer to Evidence" Section
+    # "How It Works" Section
     st.markdown(
         """
-        <div class="process-section">
+        <div id="how-it-works-section" class="process-section" style="scroll-margin-top: 24px;">
             <div class="process-header-grid">
                 <div>
                     <h2 class="process-main-heading">
-                        From AI Answer<br>to <span class="gradient-text">Evidence.</span>
+                        How It <span class="gradient-text">Works.</span>
                     </h2>
                 </div>
                 <div>
                     <p class="process-subtext">
-                        Verity follows a simple process to help you understand what's real, what's uncertain, and what's not.
+                        Verity follows a simple four-step process to help you understand what is real, what is uncertain, and what is contradicted.
                     </p>
-                    <div class="process-learn-more">✦ LEARN MORE →</div>
+                    <a href="#ask-verity-console" class="process-learn-more" style="text-decoration: none;">✦ LEARN MORE →</a>
                 </div>
             </div>
             <div class="process-steps-grid">
@@ -866,32 +897,32 @@ if nav_page == "Check Answer":
                         <span class="step-number">01</span>
                         <div class="step-icon">🔍</div>
                     </div>
-                    <div class="step-title">Read</div>
-                    <p class="step-desc">Verity understands the question and AI response.</p>
+                    <div class="step-title">01 — READ</div>
+                    <p class="step-desc">Understand the question and AI-generated answer.</p>
                 </div>
                 <div class="process-step-card">
                     <div class="step-badge">
                         <span class="step-number">02</span>
                         <div class="step-icon">🌐</div>
                     </div>
-                    <div class="step-title">Investigate</div>
-                    <p class="step-desc">Verity retrieves relevant evidence and sources.</p>
+                    <div class="step-title">02 — INVESTIGATE</div>
+                    <p class="step-desc">Retrieve relevant evidence and sources.</p>
                 </div>
                 <div class="process-step-card">
                     <div class="step-badge">
                         <span class="step-number">03</span>
                         <div class="step-icon">✓</div>
                     </div>
-                    <div class="step-title">Verify</div>
-                    <p class="step-desc">Claims are compared against the retrieved evidence.</p>
+                    <div class="step-title">03 — VERIFY</div>
+                    <p class="step-desc">Compare factual claims against the retrieved evidence.</p>
                 </div>
                 <div class="process-step-card">
                     <div class="step-badge">
                         <span class="step-number">04</span>
                         <div class="step-icon">📄</div>
                     </div>
-                    <div class="step-title">Explain</div>
-                    <p class="step-desc">You get a clear explanation of what holds up.</p>
+                    <div class="step-title">04 — EXPLAIN</div>
+                    <p class="step-desc">Present supported, partially supported, contradicted, and unverified claims clearly.</p>
                 </div>
             </div>
         </div>

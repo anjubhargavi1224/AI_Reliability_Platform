@@ -66,13 +66,30 @@ def classify_source_type(domain: str, url: str) -> SourceType:
     domain_lower = domain.lower()
     url_lower = url.lower()
 
-    if domain_lower.endswith(".gov") or ".gov." in domain_lower:
+    if (
+        domain_lower.endswith(".gov")
+        or ".gov." in domain_lower
+        or "nasa.gov" in domain_lower
+        or "cdc.gov" in domain_lower
+        or "nih.gov" in domain_lower
+        or "fda.gov" in domain_lower
+        or "noaa.gov" in domain_lower
+        or "epa.gov" in domain_lower
+        or "who.int" in domain_lower
+        or "esa.int" in domain_lower
+    ):
         return "government"
     if (
         domain_lower.endswith(".edu")
         or ".edu." in domain_lower
         or "arxiv.org" in domain_lower
         or "ncbi.nlm.nih.gov" in domain_lower
+        or "nature.com" in domain_lower
+        or "sciencedirect.com" in domain_lower
+        or "cell.com" in domain_lower
+        or "springer.com" in domain_lower
+        or "ieee.org" in domain_lower
+        or "acm.org" in domain_lower
     ):
         return "academic"
     if "wikipedia.org" in domain_lower or "britannica.com" in domain_lower:
@@ -83,6 +100,9 @@ def classify_source_type(domain: str, url: str) -> SourceType:
         or "developer." in domain_lower
         or "support." in domain_lower
         or "help." in domain_lower
+        or "legal." in domain_lower
+        or "apple.com" in domain_lower
+        or "microsoft.com" in domain_lower
         or "github.com" in domain_lower
         or "python.org" in domain_lower
         or "mozilla.org" in domain_lower
@@ -99,11 +119,54 @@ def classify_source_type(domain: str, url: str) -> SourceType:
             "nytimes.com",
             "wsj.com",
             "theguardian.com",
+            "scientificamerican.com",
+            "newscientist.com",
         )
     ):
         return "news"
 
     return "general_web"
+
+
+def get_source_tier(source_type_or_domain: str, url: str = "") -> int:
+    """Return the authority tier (1 to 4) of a source.
+    
+    Tier 1: Government, NASA/scientific agencies, official docs/policies, universities, peer-reviewed research.
+    Tier 2: Established international and professional scientific bodies.
+    Tier 3: Reputable encyclopedias (Wikipedia, Britannica) and major news agencies.
+    Tier 4: Generic websites, blogs, aggregators.
+    """
+    domain = source_type_or_domain.lower()
+    s_type = classify_source_type(domain, url) if ("." in domain or "/" in url) else source_type_or_domain
+
+    if s_type in ("government", "academic", "official_doc"):
+        return 1
+    if any(d in domain for d in ("who.int", "esa.int", "cern.ch", "ieee.org", "acm.org", "wmo.int")):
+        return 2
+    if s_type in ("encyclopedia", "news"):
+        return 3
+    return 4
+
+
+def get_source_authority_label(source_type_or_domain: str, url: str = "") -> str:
+    """Return an accurate authority classification label for a source.
+    
+    Labels:
+    - Primary / Official (Tier 1: official government, NASA, regulatory, vendor documentation)
+    - Academic (Tier 1: universities, peer-reviewed scientific journals, research institutions)
+    - Reputable Secondary (Tier 3: encyclopedias like Wikipedia/Britannica, major news agencies)
+    - General Web (Tier 4: blogs, forums, generic websites)
+    """
+    domain = source_type_or_domain.lower()
+    s_type = classify_source_type(domain, url) if ("." in domain or "/" in url) else source_type_or_domain
+
+    if s_type in ("government", "official_doc"):
+        return "Primary / Official"
+    if s_type == "academic":
+        return "Academic"
+    if s_type in ("encyclopedia", "news"):
+        return "Reputable Secondary"
+    return "General Web"
 
 
 def clean_ddg_url(raw_url: str) -> str:
@@ -171,17 +234,17 @@ class WebRetriever:
 
         # Sort by source authority and relevance
         authority_priority = {
-            "government": 1.0,
-            "official_doc": 0.95,
-            "academic": 0.9,
-            "encyclopedia": 0.85,
-            "news": 0.8,
-            "general_web": 0.7,
+            "government": 1.5,
+            "official_doc": 1.4,
+            "academic": 1.3,
+            "encyclopedia": 1.2,
+            "news": 1.0,
+            "general_web": 0.6,
         }
 
         for idx, src in enumerate(results):
-            base_score = authority_priority.get(src.source_type, 0.7)
-            rank_discount = max(0.0, 1.0 - (idx * 0.05))
+            base_score = authority_priority.get(src.source_type, 0.6)
+            rank_discount = max(0.1, 1.0 - (idx * 0.04))
             src.relevance_score = round(base_score * rank_discount, 3)
 
         results.sort(key=lambda s: s.relevance_score, reverse=True)

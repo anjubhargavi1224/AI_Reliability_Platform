@@ -266,7 +266,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     story.append(Spacer(1, 10))
 
     # 5. Sources Used
-    story.append(Paragraph("Authoritative Sources Consulted", h2_style))
+    story.append(Paragraph("External Evidence Sources Consulted", h2_style))
     sources_used = report_data.get("sources_used", [])
     
     if not sources_used:
