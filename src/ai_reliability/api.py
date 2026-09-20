@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Literal
 from threading import BoundedSemaphore
 from starlette.concurrency import run_in_threadpool
+from time import perf_counter
 from pydantic import ValidationError
 from fastapi.responses import Response
 from ai_reliability.config import load_config
@@ -34,6 +35,7 @@ from ai_reliability.benchmarks.runner import (
     export_benchmark_json,
     export_benchmark_csv,
 )
+from ai_reliability.metrics.collector import default_collector
 
 logger = logging.getLogger("ai_reliability")
 _extraction_slots = BoundedSemaphore(2)
@@ -68,6 +70,20 @@ def create_app(db_path=None, config=None):
         allow_headers=["*"],
     )
     app.add_middleware(RequestBodyLimit)
+
+    @app.middleware("http")
+    async def metrics_middleware(request: Request, call_next):
+        start_time = perf_counter()
+        try:
+            response = await call_next(request)
+            duration_ms = (perf_counter() - start_time) * 1000.0
+            default_collector.record_request(request.url.path, response.status_code, duration_ms)
+            return response
+        except Exception as exc:
+            duration_ms = (perf_counter() - start_time) * 1000.0
+            default_collector.record_request(request.url.path, 500, duration_ms)
+            raise exc
+
     settings = config.model_copy(deep=True) if config is not None else load_config(os.getenv("AI_RELIABILITY_CONFIG"))
     logger.info("Initialized AI Reliability API application")
 
@@ -95,6 +111,11 @@ def create_app(db_path=None, config=None):
         except Exception as exc:
             logger.error("Readiness check failed: %s", type(exc).__name__)
             raise HTTPException(503, "Service unavailable") from None
+
+    @app.get("/metrics")
+    def metrics():
+        """Retrieve aggregated in-process operational metrics and diagnostics."""
+        return default_collector.snapshot()
 
     @app.get("/evaluators", response_model=list[EvaluatorSummary])
     def list_evaluators(
@@ -171,6 +192,7 @@ def create_app(db_path=None, config=None):
     @app.get("/experiments/{experiment_id}/export")
     def export(experiment_id: str, format: str = Query("json", pattern="^(json|csv|markdown)$")):
         experiment = get(experiment_id)
+        default_collector.record_export_generated(format)
         if format == "json":
             content, media_type, ext = export_json(experiment), "application/json", "json"
         elif format == "csv":
@@ -185,6 +207,7 @@ def create_app(db_path=None, config=None):
         """Generate a structured research-grade evaluation report for an experiment."""
         experiment = get(experiment_id)
         report = generate_research_report(experiment)
+        default_collector.record_report_generated("research")
         if format == "markdown":
             return Response(export_markdown_report(report), media_type="text/markdown")
         return report

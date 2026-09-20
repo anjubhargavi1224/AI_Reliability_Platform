@@ -35,6 +35,38 @@ if health is None:
 enabled = health.json()["external_judge_enabled"]
 st.info("External semantic judge: " + ("enabled by server configuration; submitted question, response, instructions and context will be sent to its provider." if enabled else "disabled (default local operation); semantic results will be not_assessed. Zero API keys required for normal deterministic operation."))
 
+# System Health & Operational Observability
+with st.expander("System Health & Operational Diagnostics", expanded=False):
+    ready_resp = api("GET", "/ready")
+    metrics_resp = api("GET", "/metrics")
+    if ready_resp is not None and metrics_resp is not None:
+        r_data = ready_resp.json()
+        m_data = metrics_resp.json()
+        
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("API Status", r_data.get("status", "unknown").upper())
+        c2.metric("Database", r_data.get("database", "unknown").title())
+        c3.metric("Evaluators Loaded", r_data.get("evaluators_loaded", 0))
+        c4.metric("Uptime", f"{m_data.get('process', {}).get('uptime_seconds', 0):.1f}s")
+        
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.markdown("#### API Requests")
+            st.write(f"- **Total Requests:** {m_data.get('api', {}).get('total_requests', 0)}")
+            st.write(f"- **Mean Latency:** {m_data.get('api', {}).get('mean_request_latency_ms', 0):.2f} ms")
+            if m_data.get('api', {}).get('status_codes'):
+                st.caption(f"Status Codes: {json.dumps(m_data['api']['status_codes'])}")
+        with col_b:
+            st.markdown("#### Evaluation Engine")
+            st.write(f"- **Evaluator Runs:** {m_data.get('evaluations', {}).get('total_evaluator_executions', 0)}")
+            st.write(f"- **Status Counts:** {json.dumps(m_data.get('evaluations', {}).get('status_counts', {}))}")
+        with col_c:
+            st.markdown("#### Benchmarks & Reports")
+            st.write(f"- **Benchmark Runs:** {m_data.get('benchmarks', {}).get('total_runs', 0)}")
+            st.write(f"- **Cases Evaluated:** {m_data.get('benchmarks', {}).get('total_cases_evaluated', 0)}")
+            st.write(f"- **Reports Generated:** {m_data.get('reports_and_exports', {}).get('research_reports_generated', 0)}")
+
+
 # Evaluator Catalog / Evaluation Methods Taxonomy Guide
 evaluators_resp = api("GET", "/evaluators")
 if evaluators_resp is not None:

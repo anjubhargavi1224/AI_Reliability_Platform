@@ -10,6 +10,7 @@ from ai_reliability.schemas.result import (
     EvaluationReport,
     EvaluatorResult,
 )
+from ai_reliability.metrics.collector import default_collector
 
 
 class Evaluator(Protocol):
@@ -98,6 +99,12 @@ class EvaluationEngine:
             result.evaluation_latency_ms = (
                 perf_counter() - check_started
             ) * 1000
+            default_collector.record_evaluator_execution(
+                evaluator_id=result.evaluator_id,
+                status=result.status,
+                duration_ms=result.evaluation_latency_ms,
+                error_type=result.error_type,
+            )
             results.append(result)
 
         return EvaluationReport(

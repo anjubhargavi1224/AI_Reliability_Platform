@@ -19,6 +19,7 @@ from ai_reliability.benchmarks.models import (
 from ai_reliability.config import PlatformConfig, build_engine
 from ai_reliability.schemas.record import EvaluationRecord
 from ai_reliability.schemas.result import EvaluationReport, EvaluatorResult
+from ai_reliability.metrics.collector import default_collector
 
 DEFAULT_BENCHMARK_PATH = (
     Path(__file__).parents[3] / "data/benchmarks/synthetic_benchmark_suite_v1.json"
@@ -167,6 +168,13 @@ class BenchmarkRunner:
             )
 
         total_latency_ms = (perf_counter() - run_start) * 1000.0
+
+        default_collector.record_benchmark_run(
+            total_cases=len(dataset.cases),
+            completed_cases=completed_cases,
+            errors=error_cases,
+            duration_ms=total_latency_ms,
+        )
 
         return BenchmarkReport(
             benchmark_name=dataset.name,

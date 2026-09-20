@@ -410,6 +410,28 @@ curl http://127.0.0.1:8000/ready
 | **Benchmark Execution** | 27 cases executed in ~0.35s (0 errors, deterministic) | ✅ Verified |
 | **Security & Redaction** | Zero credentials in logs, exports, or reports | ✅ Verified |
 
+## Phase 10: Observability, Metrics & Production Diagnostics
+
+Phase 10 adds a zero-overhead, in-process operational observability layer designed for granular runtime diagnostics without external daemons or telemetry leak risks.
+
+### 1. Observability Architecture
+- **In-Process Collector (`MetricsCollector`)**: Thread-safe counters and execution timers tracking operational metrics across API, evaluation engine, individual evaluators, benchmark runner, report generation, and database operations.
+- **Strict Separation of Metrics**: Operational measurements (e.g. request counts, HTTP status distribution, evaluator execution latency) are strictly isolated from evaluation measurements (e.g. claim alignment ratio, Reciprocal Rank). No "overall reliability score" or fake health percentage is computed.
+- **Data Privacy & Redaction**: Metrics record strictly operational dimensions (counts, durations, status codes, sanitized error types). Prompts, responses, context, evidence texts, and credentials are never captured in metrics.
+
+### 2. Operational Metrics & Endpoints
+- `GET /metrics`: Returns structured runtime diagnostics:
+  - **Uptime & Timestamps**: Platform start time, snapshot timestamp, uptime in seconds.
+  - **API Metrics**: Total requests, success count (2xx/3xx), error count (4xx/5xx), average latency ms, and HTTP status code distribution.
+  - **Evaluation Metrics**: Record evaluation count, completed evaluations, failed evaluations, and average evaluation duration.
+  - **Evaluator Breakdown**: Per-evaluator invocation count, success count, error count, average execution ms, and error type distribution.
+  - **Benchmark Metrics**: Total benchmark runs, dataset runs, case executions, failed cases, and average execution duration.
+  - **Report & Storage Metrics**: Generated JSON/CSV/Markdown reports, exported snapshots, database operations, and database errors.
+- `GET /health` & `GET /ready`: Fast, deterministic health and readiness probes reporting operational health status without exposing sensitive filesystem paths.
+
+### 3. Dashboard Diagnostics
+The Streamlit UI includes a compact **System Health & Operational Diagnostics** expander displaying real-time API connectivity, SQLite storage state, loaded evaluator count, and live invocation/timing metrics directly in the interface.
+
 ## Limitations
 
 - The platform evaluates supplied responses and does not generate candidate text.
@@ -422,6 +444,7 @@ curl http://127.0.0.1:8000/ready
 - Structured citations are not inferred from inline brackets or text markers.
 - Evaluated content is untrusted data and could contain prompt injection.
 - Reports and exports are unredacted and include all evaluated content.
+
 
 
 
