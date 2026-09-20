@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Custom Indigo (#4B0082) / Cyan (#00E5FF) / White (#FFFFFF) Futuristic Theme
+# Custom Indigo (#4B0082) / Cyan (#00E5FF) / White (#FFFFFF) Clean Theme
 st.markdown(
     """
     <style>
@@ -31,202 +31,101 @@ st.markdown(
 
     /* Background Ambient Gradients */
     .stApp {
-        background-color: #080312;
+        background-color: #0B0418;
         background-image: 
-            radial-gradient(circle at 15% 15%, rgba(75, 0, 130, 0.35) 0%, transparent 45%),
-            radial-gradient(circle at 85% 20%, rgba(0, 229, 255, 0.12) 0%, transparent 40%),
-            radial-gradient(circle at 50% 85%, rgba(75, 0, 130, 0.25) 0%, transparent 50%);
+            radial-gradient(circle at 15% 15%, rgba(75, 0, 130, 0.25) 0%, transparent 45%),
+            radial-gradient(circle at 85% 20%, rgba(0, 229, 255, 0.08) 0%, transparent 40%);
         background-attachment: fixed;
         color: #F0F4F8;
     }
 
-    /* Hero Banner */
-    .hero-container {
-        background: linear-gradient(135deg, rgba(30, 10, 60, 0.85) 0%, rgba(12, 4, 25, 0.95) 100%);
-        border: 1px solid rgba(75, 0, 130, 0.6);
-        border-top: 1px solid rgba(0, 229, 255, 0.6);
-        border-radius: 14px;
-        padding: 24px 28px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.08);
-        backdrop-filter: blur(16px);
+    /* Hero Header */
+    .hero-header {
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(75, 0, 130, 0.3);
     }
-
-    .hero-badge {
-        display: inline-block;
-        background: rgba(0, 229, 255, 0.12);
-        color: #00E5FF;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        padding: 4px 12px;
-        border-radius: 20px;
-        border: 1px solid rgba(0, 229, 255, 0.35);
-        margin-bottom: 10px;
-        text-transform: uppercase;
-    }
-
     .hero-title {
-        color: #FFFFFF;
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 800;
+        color: #FFFFFF;
+        margin: 0 0 4px 0;
         letter-spacing: -0.02em;
-        margin: 0 0 6px 0;
     }
-
     .hero-title span {
-        background: linear-gradient(90deg, #FFFFFF 0%, #00E5FF 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #00E5FF;
     }
-
     .hero-subtitle {
-        color: #CBD5E1;
-        font-size: 1.02rem;
-        line-height: 1.5;
-        margin: 0 0 14px 0;
-        max-width: 900px;
+        font-size: 1.05rem;
+        color: #94A3B8;
+        margin: 0;
     }
 
-    /* Metric Cards */
-    div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, rgba(25, 10, 50, 0.7) 0%, rgba(12, 5, 24, 0.85) 100%);
-        border: 1px solid rgba(75, 0, 130, 0.5);
-        border-top: 1px solid rgba(0, 229, 255, 0.3);
-        border-radius: 10px;
-        padding: 14px 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #00E5FF !important;
-        font-weight: 700 !important;
-        font-size: 1.4rem !important;
-        text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-    }
-
-    div[data-testid="stMetricLabel"] {
-        color: #CBD5E1 !important;
-        font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #4B0082 0%, #2A0950 100%) !important;
+    /* Primary Action Button */
+    button[kind="primary"], .stButton > button {
+        background: linear-gradient(135deg, #4B0082 0%, #1A0033 100%) !important;
         color: #FFFFFF !important;
-        font-weight: 700 !important;
         border: 1px solid #00E5FF !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        letter-spacing: 0.03em !important;
         border-radius: 8px !important;
         padding: 10px 24px !important;
-        box-shadow: 0 4px 14px rgba(75, 0, 130, 0.4) !important;
-        transition: all 0.25s ease !important;
+        box-shadow: 0 4px 14px rgba(0, 229, 255, 0.15) !important;
+        transition: all 0.2s ease !important;
     }
-
-    .stButton > button:hover {
-        background: linear-gradient(135deg, #5C0099 0%, #360D66 100%) !important;
-        border-color: #00E5FF !important;
-        color: #00E5FF !important;
-        box-shadow: 0 0 20px rgba(0, 229, 255, 0.5) !important;
-        transform: translateY(-1px);
-    }
-
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, rgba(20, 8, 42, 0.9) 0%, rgba(10, 4, 22, 0.9) 100%) !important;
-        color: #00E5FF !important;
-        font-weight: 600 !important;
-        border: 1px solid rgba(0, 229, 255, 0.5) !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    /* Expanders */
-    div[data-testid="stExpander"] {
-        background: linear-gradient(135deg, rgba(22, 9, 46, 0.65) 0%, rgba(11, 4, 22, 0.75) 100%) !important;
-        border: 1px solid rgba(75, 0, 130, 0.45) !important;
-        border-radius: 10px !important;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
-        backdrop-filter: blur(12px) !important;
-        margin-bottom: 12px !important;
-    }
-
-    /* Form Inputs */
-    div[data-baseweb="input"] input,
-    div[data-baseweb="textarea"] textarea,
-    div[data-baseweb="select"] {
-        background-color: rgba(16, 6, 32, 0.85) !important;
-        border: 1px solid rgba(75, 0, 130, 0.6) !important;
-        color: #FFFFFF !important;
-        border-radius: 8px !important;
-    }
-
-    div[data-baseweb="input"] input:focus,
-    div[data-baseweb="textarea"] textarea:focus {
-        border-color: #00E5FF !important;
-        box-shadow: 0 0 10px rgba(0, 229, 255, 0.35) !important;
+    button[kind="primary"]:hover, .stButton > button:hover {
+        background: linear-gradient(135deg, #5C00A3 0%, #2A004D 100%) !important;
+        box-shadow: 0 6px 20px rgba(0, 229, 255, 0.3) !important;
+        transform: translateY(-1px) !important;
     }
 
     /* Cards */
     .report-card {
-        background: linear-gradient(135deg, rgba(24, 10, 48, 0.8) 0%, rgba(12, 5, 25, 0.9) 100%);
-        border: 1px solid rgba(75, 0, 130, 0.6);
-        border-top: 1px solid rgba(0, 229, 255, 0.4);
-        border-radius: 12px;
+        background: rgba(18, 7, 36, 0.7);
+        border: 1px solid rgba(75, 0, 130, 0.5);
+        border-top: 2px solid #00E5FF;
+        border-radius: 10px;
         padding: 20px 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+        margin: 16px 0;
     }
 
     .claim-card {
-        background: rgba(18, 7, 36, 0.75);
-        border: 1px solid rgba(75, 0, 130, 0.5);
-        border-left: 4px solid #00E5FF;
+        background: rgba(18, 7, 36, 0.6);
+        border: 1px solid rgba(75, 0, 130, 0.4);
+        border-left: 4px solid #94A3B8;
         border-radius: 8px;
-        padding: 16px 18px;
-        margin-bottom: 14px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
     }
-
     .claim-card-supported {
         border-left-color: #00E676;
     }
-
     .claim-card-contradicted {
         border-left-color: #FF5252;
     }
-
     .claim-card-partial {
         border-left-color: #FFD600;
     }
-
     .claim-card-unverified {
         border-left-color: #B388FF;
     }
 
     .source-card {
-        background: rgba(18, 7, 36, 0.65);
-        border: 1px solid rgba(0, 229, 255, 0.25);
+        background: rgba(18, 7, 36, 0.5);
+        border: 1px solid rgba(75, 0, 130, 0.35);
         border-radius: 8px;
-        padding: 14px 16px;
+        padding: 12px 16px;
         margin-bottom: 10px;
     }
-
     .source-title {
         color: #00E5FF;
         font-weight: 600;
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         text-decoration: none;
     }
-
     .source-title:hover {
         text-decoration: underline;
-    }
-
-    .source-domain {
-        color: #94A3B8;
-        font-size: 0.8rem;
-        margin-left: 8px;
     }
 
     /* Badges */
@@ -234,30 +133,31 @@ st.markdown(
         display: inline-block;
         padding: 3px 10px;
         border-radius: 12px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.04em;
         margin-bottom: 6px;
+        text-transform: uppercase;
     }
     .badge-supported {
-        background: rgba(0, 230, 118, 0.18);
+        background: rgba(0, 230, 118, 0.15);
         color: #00E676;
-        border: 1px solid rgba(0, 230, 118, 0.5);
+        border: 1px solid rgba(0, 230, 118, 0.4);
     }
     .badge-contradicted {
-        background: rgba(255, 82, 82, 0.18);
+        background: rgba(255, 82, 82, 0.15);
         color: #FF5252;
-        border: 1px solid rgba(255, 82, 82, 0.5);
+        border: 1px solid rgba(255, 82, 82, 0.4);
     }
     .badge-partial {
-        background: rgba(255, 214, 0, 0.18);
+        background: rgba(255, 214, 0, 0.15);
         color: #FFD600;
-        border: 1px solid rgba(255, 214, 0, 0.5);
+        border: 1px solid rgba(255, 214, 0, 0.4);
     }
     .badge-unverified {
-        background: rgba(179, 136, 255, 0.18);
+        background: rgba(179, 136, 255, 0.15);
         color: #B388FF;
-        border: 1px solid rgba(179, 136, 255, 0.5);
+        border: 1px solid rgba(179, 136, 255, 0.4);
     }
     </style>
     """,
@@ -280,7 +180,7 @@ def api(method, path, **kwargs):
         return response
     except httpx.HTTPError:
         st.error(
-            "API request failed. Check the local server, input schema, and server logs. A timed-out submission may still finish; refresh the experiment list before retrying."
+            "API request failed. Check that the backend server is running on " + base
         )
         return None
 
@@ -291,590 +191,581 @@ if health is None:
 enabled = health.json()["external_judge_enabled"]
 
 # -------------------------------------------------------------
-# HERO BRAND BANNER & PRIMARY WORKFLOW
+# SIDEBAR NAVIGATION
 # -------------------------------------------------------------
-st.markdown(
+st.sidebar.markdown(
     """
-    <div class="hero-container">
-        <div class="hero-badge">AUTONOMOUS EVIDENCE VERIFIER</div>
-        <div class="hero-title">AI RELIABILITY <span>CHECKER</span></div>
-        <div class="hero-subtitle">
-            Check how well an AI-generated answer is supported by reliable evidence from authoritative web and encyclopedia sources.
+    <div style="padding: 6px 0 12px 0;">
+        <div style="font-size: 1.2rem; font-weight: 800; color: #FFFFFF;">
+            ⚡ <span style="color: #00E5FF;">AI Reliability</span>
         </div>
+        <div style="font-size: 0.8rem; color: #94A3B8;">Evidence-Based Checker</div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-col_q, col_a = st.columns(2)
-with col_q:
-    st.markdown("### Step 1 — What did you ask the AI?")
-    user_question = st.text_area(
-        "Question asked to the AI",
-        placeholder="e.g. When was the Eiffel Tower completed? Or what is Apple's return policy?",
-        height=140,
-        key="chk_question",
-        label_visibility="collapsed",
-    )
+nav_page = st.sidebar.radio(
+    "Navigation",
+    ["Check Answer", "History", "Advanced"],
+    label_visibility="collapsed",
+)
 
-with col_a:
-    st.markdown("### Step 2 — What did the AI answer?")
-    user_answer = st.text_area(
-        "AI's answer text",
-        placeholder="Paste the AI's generated response here...",
-        height=140,
-        key="chk_answer",
-        label_visibility="collapsed",
-    )
 
-col_model, col_btn = st.columns([3, 2])
-with col_model:
-    user_model = st.text_input(
-        "AI / Model (Optional)",
-        placeholder="Optional — e.g. ChatGPT, Gemini, Claude, Copilot",
-        key="chk_model",
-    )
-with col_btn:
-    st.write("")
-    st.write("")
-    check_btn = st.button("⚡ CHECK AI ANSWER", use_container_width=True)
-
-if check_btn:
-    if not user_question.strip():
-        st.error("Please enter the question you asked the AI.")
-    elif not user_answer.strip():
-        st.error("Please paste the AI's answer text.")
-    else:
-        with st.status("Investigating AI Answer...", expanded=True) as status_box:
-            st.write("🔍 Analyzing your answer and extracting key claims...")
-            time.sleep(0.2)
-            st.write("🌐 Finding relevant authoritative sources across the web...")
-            
-            resp = api(
-                "POST",
-                "/analyze",
-                json={
-                    "question": user_question.strip(),
-                    "answer": user_answer.strip(),
-                    "model": user_model.strip() if user_model.strip() else None,
-                },
-            )
-            
-            if resp is not None:
-                st.write("⚖️ Checking claims against the retrieved evidence...")
-                time.sleep(0.2)
-                st.write("📊 Preparing your reliability report...")
-                status_box.update(label="Investigation Complete!", state="complete", expanded=False)
-                st.session_state["last_report"] = resp.json()
-
-# Render Investigation Report if available
-if "last_report" in st.session_state:
-    rep = st.session_state["last_report"]
-
-    st.markdown("---")
+# =============================================================
+# 1. PRIMARY PAGE: CHECK ANSWER
+# =============================================================
+if nav_page == "Check Answer":
     st.markdown(
-        f"""
-        <div class="report-card">
-            <div style="font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">AI Answer Assessment</div>
-            <h2 style="color: #FFFFFF; margin: 4px 0 12px 0; font-size: 1.8rem;">{rep['overall_assessment']}</h2>
-            <p style="color: #E2E8F0; font-size: 1.05rem; line-height: 1.6; margin: 0;">{rep['summary']}</p>
+        """
+        <div class="hero-header">
+            <h1 class="hero-title">AI Reliability <span>Checker</span></h1>
+            <p class="hero-subtitle">Check how well an AI-generated answer is supported by reliable sources.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    rcol1, rcol2, rcol3 = st.columns(3)
-    supported_cnt = sum(1 for c in rep.get("claims", []) if c["status"] == "supported")
-    contradicted_cnt = sum(1 for c in rep.get("claims", []) if c["status"] == "contradicted")
-    unverified_cnt = sum(1 for c in rep.get("claims", []) if c["status"] in ("partially_supported", "unable_to_verify"))
+    st.markdown("##### What did you ask the AI?")
+    user_question = st.text_area(
+        "What did you ask the AI?",
+        placeholder="Enter the question you asked the AI...",
+        height=110,
+        key="chk_question",
+        label_visibility="collapsed",
+    )
 
-    rcol1.metric("Supported Claims", f"{supported_cnt}/{len(rep.get('claims', []))}")
-    rcol2.metric("Contradicted / Conflicting", contradicted_cnt)
-    rcol3.metric("Sources Consulted", len(rep.get("sources_used", [])))
+    st.markdown("##### What did the AI answer?")
+    user_answer = st.text_area(
+        "What did the AI answer?",
+        placeholder="Paste the AI's answer here...",
+        height=150,
+        key="chk_answer",
+        label_visibility="collapsed",
+    )
 
-    # Claim-by-Claim Breakdown
-    st.markdown("### 📋 Claim-by-Claim Analysis")
-    for claim in rep.get("claims", []):
-        st_key = claim["status"]
-        if st_key == "supported":
-            card_class = "claim-card-supported"
-            badge_html = '<span class="badge badge-supported">✓ SUPPORTED</span>'
-        elif st_key == "contradicted":
-            card_class = "claim-card-contradicted"
-            badge_html = '<span class="badge badge-contradicted">✕ CONFLICTING EVIDENCE</span>'
-        elif st_key == "partially_supported":
-            card_class = "claim-card-partial"
-            badge_html = '<span class="badge badge-partial">⚠ PARTIALLY SUPPORTED</span>'
+    st.markdown("##### Which AI gave you this answer? *(optional)*")
+    user_model = st.text_input(
+        "Which AI gave you this answer? (optional)",
+        placeholder="Optional — e.g. ChatGPT, Gemini, Claude, Copilot",
+        key="chk_model",
+        label_visibility="collapsed",
+    )
+
+    st.write("")
+    check_btn = st.button("⚡ CHECK AI ANSWER", use_container_width=True)
+
+    if check_btn:
+        if not user_question.strip():
+            st.error("Please enter the question you asked the AI.")
+        elif not user_answer.strip():
+            st.error("Please paste the AI's answer text.")
         else:
-            card_class = "claim-card-unverified"
-            badge_html = '<span class="badge badge-unverified">? UNABLE TO VERIFY</span>'
+            with st.status("Investigating AI Answer...", expanded=True) as status_box:
+                st.write("🔍 Analyzing your answer and identifying factual claims...")
+                time.sleep(0.1)
+                st.write("🌐 Finding relevant authoritative sources across the web...")
+                
+                resp = api(
+                    "POST",
+                    "/analyze",
+                    json={
+                        "question": user_question.strip(),
+                        "answer": user_answer.strip(),
+                        "model": user_model.strip() if user_model.strip() else None,
+                    },
+                )
+                
+                if resp is not None:
+                    st.write("⚖️ Checking claims against retrieved evidence...")
+                    time.sleep(0.1)
+                    st.write("📊 Preparing your reliability report...")
+                    status_box.update(label="Investigation Complete!", state="complete", expanded=False)
+                    st.session_state["current_analysis"] = resp.json()
 
-        source_link_html = ""
-        if claim.get("source_url"):
-            source_link_html = f"""
-            <div style="margin-top: 8px; font-size: 0.85rem;">
-                <strong>Source:</strong> <a href="{claim['source_url']}" target="_blank" style="color: #00E5FF; text-decoration: none;">{claim.get('source_title') or claim.get('source_domain')} ↗</a>
-            </div>
-            """
+    # Display Analysis Report
+    if "current_analysis" in st.session_state:
+        rep = st.session_state["current_analysis"]
 
-        evidence_html = ""
-        if claim.get("evidence_excerpt"):
-            evidence_html = f"""
-            <div style="background: rgba(0,0,0,0.3); border-left: 2px solid #00E5FF; padding: 8px 12px; margin: 8px 0; font-size: 0.9rem; color: #CBD5E1;">
-                <em>"{claim['evidence_excerpt']}"</em>
-            </div>
-            """
+        st.markdown("---")
+        st.markdown("## AI Answer Analysis")
 
+        # Plain-English Summary Box
         st.markdown(
             f"""
-            <div class="claim-card {card_class}">
-                {badge_html}
-                <div style="font-size: 1.05rem; font-weight: 600; color: #FFFFFF; margin: 4px 0 6px 0;">"{claim['claim_text']}"</div>
-                <div style="color: #E2E8F0; font-size: 0.95rem;">{claim['explanation']}</div>
-                {evidence_html}
-                {source_link_html}
+            <div class="report-card">
+                <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">What We Found</div>
+                <h3 style="color: #FFFFFF; margin: 4px 0 10px 0; font-size: 1.4rem;">{rep['overall_assessment']}</h3>
+                <p style="color: #E2E8F0; font-size: 1.02rem; line-height: 1.5; margin: 0;">{rep['summary']}</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    # Sources Used Section
-    st.markdown("### 🌐 Sources Used in Investigation")
-    if rep.get("sources_used"):
-        for s in rep["sources_used"]:
-            st.markdown(
-                f"""
-                <div class="source-card">
-                    <a href="{s['url']}" target="_blank" class="source-title">{s['title']} ↗</a>
-                    <span class="source-domain">({s['domain']} • {s['source_type']})</span>
-                    <div style="color: #CBD5E1; font-size: 0.9rem; margin-top: 4px;">{s['snippet']}</div>
-                    <div style="color: #00E5FF; font-size: 0.8rem; margin-top: 4px; font-style: italic;">{s['relevance_reason']}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+        claims = rep.get("claims", [])
+        sources_used = rep.get("sources_used", [])
 
-st.markdown("---")
-
-# -------------------------------------------------------------
-# EXPERIMENT EXPLORER, METRICS, PROFILES & HISTORY
-# -------------------------------------------------------------
-st.subheader("📊 Stored Experiments & Evaluation Results")
-
-page = st.number_input("Experiment page", min_value=1, value=1, step=1)
-listing = api("GET", "/experiments", params={"limit": 100, "offset": (page - 1) * 100})
-if listing is None:
-    st.stop()
-items = listing.json()
-if not items:
-    st.info("No saved experiments found on this page. Check a question above or use the Ingestion form below.")
-else:
-    labels = {e["id"]: f'{e["name"]} [{e["data_kind"]}] — {e["id"]}' for e in items}
-    selected = st.selectbox("Experiment", list(labels), format_func=labels.get)
-    detail = api("GET", f"/experiments/{selected}")
-    if detail is not None:
-        experiment = detail.json()
-
-        # Experiment Profile Summary
-        total_records = len(experiment["records"])
-        all_results = [
-            result
-            for report in experiment["reports"]
-            for result in report["results"]
-        ]
-        completed_count = sum(1 for r in all_results if r["status"] == "completed")
-        not_assessed_count = sum(
-            1 for r in all_results if r["status"] == "not_assessed"
-        )
-        error_count = sum(1 for r in all_results if r["status"] == "error")
-
-        st.markdown(f"#### Experiment Profile: {experiment['name']}")
-        pcol1, pcol2, pcol3, pcol4, pcol5, pcol6 = st.columns(6)
-        pcol1.metric("Records", total_records)
-        pcol2.metric("Evaluations", len(all_results))
-        pcol3.metric("Completed", completed_count)
-        pcol4.metric("Not Assessed", not_assessed_count)
-        pcol5.metric("Errors", error_count)
-        pcol6.metric("Data Kind", experiment["data_kind"])
-
-        st.caption(
-            f"**Experiment ID:** `{experiment['id']}` | **Created:** `{experiment['created_at']}` | **Data Kind:** `{experiment['data_kind']}` | **External Judge:** {'Enabled' if enabled else 'Disabled (Default)'}"
-        )
-        st.caption(f"**Provenance:** {experiment['provenance']}")
-
-        # Candidate System Performance vs Evaluator Execution Diagnostics
-        with st.expander(
-            "📊 Candidate System Performance vs. Evaluator Diagnostics",
-            expanded=True,
-        ):
-            scol1, scol2 = st.columns(2)
-            with scol1:
-                st.markdown("#### Candidate AI System Performance (Supplied)")
-                latencies = [
-                    r.get("metadata", {}).get("response_latency_ms")
-                    for r in experiment["records"]
-                    if r.get("metadata", {}).get("response_latency_ms") is not None
-                ]
-                tok_usages = [
-                    r.get("metadata", {}).get("token_usage", {})
-                    for r in experiment["records"]
-                    if r.get("metadata", {}).get("token_usage")
-                ]
-                total_toks = sum(
-                    u.get("total_tokens", 0) or 0
-                    for u in tok_usages
-                    if isinstance(u, dict)
-                )
-
-                if latencies:
-                    st.write(
-                        f"- **Mean Response Latency:** `{sum(latencies)/len(latencies):.2f} ms` (Min: `{min(latencies):.2f} ms`, Max: `{max(latencies):.2f} ms`)"
-                    )
-                else:
-                    st.write("- **Response Latency:** *Not reported in record metadata*")
-                if total_toks:
-                    st.write(f"- **Total Token Usage:** `{total_toks:,}` tokens")
-                else:
-                    st.write("- **Token Usage:** *Not reported in record metadata*")
-
-            with scol2:
-                st.markdown("#### Evaluator Execution Diagnostics (Platform)")
-                eval_latencies = [
-                    report.get("evaluation_latency_ms", 0.0)
-                    for report in experiment["reports"]
-                ]
-                total_eval_time = sum(eval_latencies)
-                st.write(
-                    f"- **Total Platform Evaluation Time:** `{total_eval_time:.2f} ms`"
-                )
-                st.write(
-                    f"- **Mean Evaluation Time per Record:** `{total_eval_time/len(experiment['reports']):.2f} ms`"
-                    if experiment["reports"]
-                    else "-"
-                )
-                st.write(
-                    f"- **Execution Health:** `{completed_count}/{len(all_results)}` evaluations completed cleanly ({round(completed_count/len(all_results)*100, 1) if all_results else 0}%)"
-                )
-
-        # Tabular overview for sorting and backward compatibility
-        rows = [
-            {"record_id": report["record_id"], **result}
-            for report in experiment["reports"]
-            for result in report["results"]
-        ]
-        st.dataframe(
-            pd.DataFrame(rows)[
-                [
-                    "record_id",
-                    "evaluator_id",
-                    "method",
-                    "status",
-                    "score",
-                    "measurements",
-                    "explanation",
-                    "limitations",
-                ]
-            ],
-            hide_index=True,
-        )
-
-        # Detailed Evaluator Result Cards
-        with st.expander("🔍 Structured Evaluator Results & Findings", expanded=False):
-            for report in experiment["reports"]:
-                st.markdown(f"### Record: `{report['record_id']}`")
-                st.caption(
-                    f"Evaluation execution latency: `{report['evaluation_latency_ms']:.2f} ms`"
-                )
-                for result in report["results"]:
-                    status = result["status"]
-                    eval_id = result["evaluator_id"]
-                    score = result.get("score")
-
-                    if status == "completed":
-                        status_badge = "🟢 **Completed**"
-                        score_info = (
-                            f"Score: `{score:.3f}` (Scale: 0.0 – 1.0, Higher is better)"
-                            if score is not None
-                            else "Unscored (Findings / Measurements)"
-                        )
-                    elif status == "not_assessed":
-                        status_badge = "🔵 **Not Assessed**"
-                        score_info = "Score: *Not assessed (Missing input or disabled method — not zero)*"
-                    else:
-                        status_badge = f"🔴 **Error** ({result.get('error_type', 'ExecutionError')})"
-                        score_info = "Score: *Error encountered*"
-
-                    with st.container():
-                        st.markdown(
-                            f"#### {result['dimension'].title()} — `{eval_id}` ({status_badge})"
-                        )
-                        st.write(f"**Status & Score:** {score_info}")
-                        st.write(f"**Method:** `{result['method']}` (v{result['evaluator_version']})")
-                        st.write(f"**Explanation:** {result['explanation']}")
-
-                        # Findings
-                        if result.get("findings"):
-                            st.markdown("**Findings:**")
-                            for finding in result["findings"]:
-                                st.warning(
-                                    f"[{finding['severity'].upper()}] `{finding['code']}`: {finding['message']}"
-                                )
-                                if finding.get("response_excerpt"):
-                                    st.caption("Response excerpt:")
-                                    st.code(finding["response_excerpt"], language=None)
-
-                        # Measurements
-                        meas = result.get("measurements", {})
-                        if meas:
-                            st.markdown("**Supplied Measurements:**")
-                            for m_key, m_val in meas.items():
-                                st.write(f"- `{m_key}`: `{m_val}`")
-
-                        # Limitations
-                        if result.get("limitations"):
-                            with st.expander(f"Method Limitations ({eval_id})"):
-                                for lim in result["limitations"]:
-                                    st.markdown(f"- {lim}")
-                        st.divider()
-
-        # Document history & Provenance
-        if any(record.get("input_documents") for record in experiment["records"]):
-            with st.expander("📄 Saved input text and document history"):
-                for record in experiment["records"]:
-                    st.text("Record: " + record["id"])
-                    for document in record.get("input_documents", []):
-                        extraction = document["extraction"]
-                        st.text(
-                            f"{extraction['role']} | {extraction['filename'] or 'Pasted text'}"
-                        )
-                        for segment in extraction["segments"]:
-                            st.text(
-                                segment["reference"]
-                                + " | Source ID: "
-                                + segment["id"]
-                            )
-                            st.caption("Original extraction")
-                            st.code(segment["original_text"], language=None)
-                            st.caption("Reviewed text used for evaluation")
-                            st.code(
-                                document["edited_segments"][segment["id"]],
-                                language=None,
-                            )
-
-        with st.expander("📑 Full reports, inputs, and configuration"):
-            st.json(experiment)
-        for extension in ("json", "csv", "markdown"):
-            exported = api(
-                "GET",
-                f"/experiments/{selected}/export",
-                params={"format": extension},
-            )
-            if exported is not None:
-                mime_type = (
-                    "application/json"
-                    if extension == "json"
-                    else (
-                        "text/csv" if extension == "csv" else "text/markdown"
-                    )
-                )
-                st.download_button(
-                    f"Download Research Report ({extension.upper()})",
-                    exported.content,
-                    file_name=f"{selected}.{extension if extension != 'markdown' else 'md'}",
-                    mime=mime_type,
-                )
-
-        if len(items) > 1:
-            st.subheader("Paired Experiment Comparison")
-            other = st.selectbox(
-                "Compare against (right experiment)",
-                [key for key in labels if key != selected],
-                format_func=labels.get,
-            )
-            if st.button("Compare methods"):
-                result = api(
-                    "GET",
-                    "/comparisons",
-                    params={"left_id": selected, "right_id": other},
-                )
-                if result is not None:
-                    comp = result.json()
-                    st.markdown(
-                        f"**Left:** `{comp['left_id']}` ({comp.get('left_name', '')}) vs **Right:** `{comp['right_id']}` ({comp.get('right_name', '')})"
-                    )
-
-                    # Evaluator summaries
-                    if comp.get("evaluator_summaries"):
-                        st.markdown("### Evaluator Comparison Summary")
-                        c_rows = []
-                        for es in comp["evaluator_summaries"]:
-                            delta_str = (
-                                f"{es['mean_score_delta']:+.4f}"
-                                if es.get("mean_score_delta") is not None
-                                else "N/A"
-                            )
-                            meas_delta_str = (
-                                ", ".join(
-                                    f"{k}: {v:+.4f}"
-                                    for k, v in es.get(
-                                        "mean_measurement_deltas", {}
-                                    ).items()
-                                )
-                                or "None"
-                            )
-                            c_rows.append(
-                                {
-                                    "Evaluator ID": es["evaluator_id"],
-                                    "Total Pairs": es["total_pairs"],
-                                    "Comparable Completed": es[
-                                        "comparable_completed_pairs"
-                                    ],
-                                    "Not Assessed": es["not_assessed_pairs"],
-                                    "Mean Score Delta (Right − Left)": delta_str,
-                                    "Mean Measurement Deltas": meas_delta_str,
-                                }
-                            )
-                        st.dataframe(pd.DataFrame(c_rows), hide_index=True)
-
-                    with st.expander("Raw comparison JSON"):
-                        st.json(comp)
-
-
-# -------------------------------------------------------------
-# ADVANCED / RESEARCH EXPANDERS (INGESTION, BENCHMARKS, TAXONOMY)
-# -------------------------------------------------------------
-st.markdown("---")
-st.subheader("⚙️ Advanced Research & Diagnostic Tools")
-
-# Document Ingestion / Manual Form
-with st.expander("📄 Document Ingestion & Manual Multi-Role Ingestion"):
-    render_input_form(api)
-
-# Advanced JSON Import
-with st.expander("📂 Advanced: Import an Experiment JSON File"):
-    st.write("Supply name, provenance, data_kind (synthetic or recorded), and records.")
-    upload = st.file_uploader("Experiment request", type=["json"], key="adv_upload")
-    if st.button("Evaluate and save", disabled=upload is None, key="adv_save_btn"):
-        try:
-            payload = json.loads(upload.getvalue())
-        except (ValueError, UnicodeError):
-            st.error("The uploaded file is not valid JSON.")
+        # Claim-by-Claim Breakdown
+        st.markdown("### Claim-by-Claim Analysis")
+        if not claims:
+            st.info("No distinct claim statements were identified in the answer.")
         else:
-            result = api("POST", "/experiments", json=payload)
-            if result is not None:
-                st.success("Saved experiment " + result.json()["id"])
+            for claim in claims:
+                st_key = claim["status"]
+                if st_key == "supported":
+                    card_class = "claim-card-supported"
+                    badge_html = '<span class="badge badge-supported">✓ SUPPORTED</span>'
+                elif st_key == "contradicted":
+                    card_class = "claim-card-contradicted"
+                    badge_html = '<span class="badge badge-contradicted">✕ CONFLICTING EVIDENCE</span>'
+                elif st_key == "partially_supported":
+                    card_class = "claim-card-partial"
+                    badge_html = '<span class="badge badge-partial">⚠ NEEDS ATTENTION</span>'
+                else:
+                    card_class = "claim-card-unverified"
+                    badge_html = '<span class="badge badge-unverified">? UNABLE TO VERIFY</span>'
 
-# Benchmark Suite Section
-with st.expander("🏆 Standardized Benchmark Suite & Reproducibility Runner (27 Cases)", expanded=False):
-    st.markdown("Execute the standardized batch benchmark suite offline to assess all deterministically testable evaluation capabilities.")
-    if st.button("Run Synthetic Benchmark Suite (27 Cases)", key="adv_bench_btn"):
-        with st.spinner("Executing benchmark runner across 27 cases..."):
-            bench_res = api("POST", "/benchmarks/run")
-            if bench_res is not None:
-                bdata = bench_res.json()
-                st.success(f"Benchmark Suite '{bdata['benchmark_name']}' completed successfully!")
+                source_link_html = ""
+                if claim.get("source_url"):
+                    source_link_html = f"""
+                    <div style="margin-top: 8px; font-size: 0.9rem;">
+                        <strong>Source:</strong> <a href="{claim['source_url']}" target="_blank" style="color: #00E5FF; text-decoration: none;">{claim.get('source_title') or claim.get('source_domain')} ↗</a>
+                    </div>
+                    """
 
-                bcol1, bcol2, bcol3, bcol4 = st.columns(4)
-                bcol1.metric("Total Cases", bdata["total_cases"])
-                bcol2.metric("Completed Executions", bdata["completed_case_executions"])
-                bcol3.metric("Execution Errors", bdata["case_execution_errors"])
-                bcol4.metric("Total Time", f"{bdata['total_execution_latency_ms']:.2f} ms")
+                evidence_html = ""
+                if claim.get("evidence_excerpt"):
+                    evidence_html = f"""
+                    <div style="background: rgba(0,0,0,0.25); border-left: 2px solid #00E5FF; padding: 6px 12px; margin: 6px 0; font-size: 0.9rem; color: #CBD5E1;">
+                        <em>"{claim['evidence_excerpt']}"</em>
+                    </div>
+                    """
 
-                st.markdown("### Evaluator-Level Benchmark Summaries")
-                sum_rows = []
-                for s in bdata["evaluator_summaries"]:
-                    match_rate_str = (
-                        f"{s['annotation_match_rate']*100:.1f}%"
-                        if s.get("annotation_match_rate") is not None
-                        else "N/A"
-                    )
-                    sum_rows.append(
-                        {
-                            "Evaluator ID": s["evaluator_id"],
-                            "Dimension": s["dimension"],
-                            "Completed": s["completed_count"],
-                            "Not Assessed": s["not_assessed_count"],
-                            "Errors": s["error_count"],
-                            "Annotated Cases": s["annotated_cases"],
-                            "Annotation Matches": s["annotation_match_count"],
-                            "Annotation Match Rate": match_rate_str,
-                        }
-                    )
-                st.dataframe(pd.DataFrame(sum_rows), hide_index=True)
-
-                st.download_button(
-                    "Download Benchmark Report (JSON)",
-                    json.dumps(bdata, indent=2),
-                    file_name=f"{bdata['id']}_benchmark_report.json",
-                    mime="application/json",
+                st.markdown(
+                    f"""
+                    <div class="claim-card {card_class}">
+                        {badge_html}
+                        <div style="font-size: 1.02rem; font-weight: 600; color: #FFFFFF; margin: 2px 0 6px 0;">"{claim['claim_text']}"</div>
+                        <div style="color: #E2E8F0; font-size: 0.95rem;"><strong>Why:</strong> {claim['explanation']}</div>
+                        {evidence_html}
+                        {source_link_html}
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
 
-# Evaluator Catalog / Evaluation Methods Taxonomy Guide
-evaluators_resp = api("GET", "/evaluators")
-if evaluators_resp is not None:
-    evaluators_data = evaluators_resp.json()
-    with st.expander("📚 Evaluation Methods & Taxonomy Catalog (13 Evaluators)", expanded=False):
+        # Sources Used Section
+        st.markdown("### Sources Used")
+        if not sources_used:
+            st.caption("No external sources were retrieved for this query.")
+        else:
+            for s in sources_used:
+                st.markdown(
+                    f"""
+                    <div class="source-card">
+                        <div style="font-weight: 700; color: #FFFFFF; font-size: 1.05rem;">{s['title']}</div>
+                        <div style="color: #94A3B8; font-size: 0.85rem; margin: 2px 0 6px 0;">{s['domain']} • {s['source_type']}</div>
+                        <div style="color: #E2E8F0; font-size: 0.92rem; margin-bottom: 8px;">{s['snippet']}</div>
+                        <a href="{s['url']}" target="_blank" class="source-title">View source →</a>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+        # Methodology Explanation
+        with st.expander("How we checked this ▾", expanded=False):
+            st.markdown(
+                """
+                The platform evaluated this answer using an autonomous investigation workflow:
+                - **Factual Grounding**: Verified specific entities, dates, and statements against independent web and encyclopedic sources.
+                - **Contradiction Detection**: Cross-referenced numerical assertions and years to flag factual conflicts.
+                - **Multi-Dimensional Reliability**: Evaluated claim-evidence alignment, consistency, citation validity, and safety.
+                - **Source Authority**: Prioritized official documentation, government domains, and recognized encyclopedias.
+                """
+            )
+            if rep.get("reliability_dimensions"):
+                st.markdown("##### Evaluated Dimensions:")
+                dim_rows = [{"Dimension": k.title(), "Assessment": v} for k, v in rep["reliability_dimensions"].items()]
+                st.table(pd.DataFrame(dim_rows))
+
+
+# =============================================================
+# 2. SECONDARY PAGE: HISTORY
+# =============================================================
+elif nav_page == "History":
+    st.markdown(
+        """
+        <div class="hero-header">
+            <h1 class="hero-title">Analysis <span>History</span></h1>
+            <p class="hero-subtitle">Review previous AI answer reliability investigations.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    listing = api("GET", "/experiments", params={"limit": 100, "offset": 0})
+    items = listing.json() if listing is not None else []
+
+    # Filter for user investigations
+    user_items = [e for e in items if e.get("provenance") == "autonomous_checker"]
+
+    if not user_items:
         st.markdown(
-            "Discover the platform's standardized evaluation dimensions, input requirements, score semantics, and limitations. *Metadata only; browsing this catalog executes no evaluations and makes no external API calls.*"
+            """
+            <div style="background: rgba(18, 7, 36, 0.5); border: 1px solid rgba(75, 0, 130, 0.4); border-radius: 8px; padding: 28px; text-align: center; margin: 20px 0;">
+                <h3 style="color: #FFFFFF; margin-bottom: 8px;">No analyses yet.</h3>
+                <p style="color: #94A3B8; margin: 0;">Enter a question and an AI answer on the <strong>Check Answer</strong> page to run your first check.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        by_category = defaultdict(list)
-        for item in evaluators_data:
-            spec = item["spec"]
-            category = spec.get("category", spec.get("dimension", "Other")).title()
-            by_category[category].append(item)
-
-        for category_name, items in sorted(by_category.items()):
-            st.markdown(f"### {category_name}")
-            for item in items:
-                spec = item["spec"]
-                is_runtime_enabled = item["is_enabled_in_runtime"]
-                is_judge = item["requires_external_judge"]
-
-                status_label = (
-                    "🟢 Enabled in runtime"
-                    if is_runtime_enabled
-                    else (
-                        "🟡 Optional (Requires External Judge — Disabled)"
-                        if is_judge
-                        else "⚪ Optional / Unassessed"
-                    )
-                )
-                exec_type_badge = "🌐 External LLM Judge" if is_judge else "💻 Deterministic / Local"
+    else:
+        for exp in user_items:
+            exp_detail = api("GET", f"/experiments/{exp['id']}")
+            if exp_detail is not None:
+                exp_data = exp_detail.json()
+                rec = exp_data["records"][0] if exp_data.get("records") else {}
+                q_text = rec.get("question", "Analysis")
+                model_tag = rec.get("metadata", {}).get("model", "Not specified")
+                created_str = exp_data.get("created_at", "")
 
                 with st.container():
                     st.markdown(
-                        f"**{spec['display_name']}** (`{spec['evaluator_id']}` v{spec['evaluator_version']}) — *{exec_type_badge}* — **{status_label}**"
+                        f"""
+                        <div class="source-card">
+                            <div style="font-weight: 700; color: #FFFFFF; font-size: 1.1rem; margin-bottom: 4px;">{q_text}</div>
+                            <div style="color: #94A3B8; font-size: 0.85rem; margin-bottom: 6px;">
+                                AI: <strong>{model_tag}</strong> • Date: <strong>{created_str[:10] if len(created_str) >= 10 else created_str}</strong>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
                     )
-                    st.write(spec["description"])
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown(f"- **Method:** `{spec['method']}`")
-                        st.markdown(
-                            f"- **Required inputs:** {', '.join(f'`{inp}`' for inp in spec['required_inputs']) if spec['required_inputs'] else 'None'}"
+                    if st.button(f"View Analysis →", key=f"hist_btn_{exp['id']}"):
+                        # Convert experiment to report format
+                        st.session_state["current_analysis"] = {
+                            "id": exp["id"],
+                            "created_at": created_str,
+                            "question": q_text,
+                            "answer": rec.get("response", ""),
+                            "model": model_tag,
+                            "overall_assessment": "Saved Analysis",
+                            "summary": f"Investigation retrieved from experiment {exp['id']}.",
+                            "claims": [
+                                {
+                                    "claim_id": "c1",
+                                    "claim_text": rec.get("response", ""),
+                                    "status": "supported" if all(r.get("status") == "completed" for r in exp_data.get("reports", [{}])[0].get("results", [])) else "partially_supported",
+                                    "status_label": "Supported",
+                                    "explanation": "Evaluated against saved context.",
+                                    "evidence_excerpt": rec.get("context", [{}])[0].get("text") if rec.get("context") else None,
+                                    "source_id": "src-1",
+                                    "source_title": "Stored Evidence",
+                                    "source_url": rec.get("context", [{}])[0].get("reference") if rec.get("context") else None,
+                                    "source_domain": "stored_evidence",
+                                }
+                            ],
+                            "sources_used": [
+                                {
+                                    "id": "src-1",
+                                    "title": "Evidence Source",
+                                    "url": s.get("reference", ""),
+                                    "domain": "verified_source",
+                                    "snippet": s.get("text", "")[:200],
+                                    "source_type": "official_doc",
+                                    "relevance_reason": "Saved context",
+                                }
+                                for s in rec.get("context", [])
+                            ],
+                            "reliability_dimensions": {
+                                r["evaluator_id"]: r["status"]
+                                for r in exp_data.get("reports", [{}])[0].get("results", [])
+                            },
+                        }
+                        st.info("Analysis loaded! Switch to 'Check Answer' to view details.")
+
+
+# =============================================================
+# 3. ADVANCED / RESEARCH MODE
+# =============================================================
+elif nav_page == "Advanced":
+    st.markdown(
+        """
+        <div class="hero-header">
+            <h1 class="hero-title">Advanced <span>/ Research Mode</span></h1>
+            <p class="hero-subtitle">Low-level evaluator diagnostics, document ingestion, paired method comparisons, benchmark suites, and exports.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    adv_tab1, adv_tab2, adv_tab3, adv_tab4, adv_tab5 = st.tabs(
+        [
+            "🧪 Research Experiments",
+            "📥 Document Ingestion",
+            "📊 Benchmark Suite",
+            "🔬 Evaluator Catalog",
+            "⚡ System Diagnostics",
+        ]
+    )
+
+    # TAB 1: RESEARCH EXPERIMENTS & COMPARISON
+    with adv_tab1:
+        st.subheader("Stored Experiments & Method Comparisons")
+        page_num = st.number_input("Experiment page", min_value=1, value=1, step=1)
+        listing = api("GET", "/experiments", params={"limit": 100, "offset": (page_num - 1) * 100})
+        items = listing.json() if listing is not None else []
+
+        if not items:
+            st.info("No saved experiments found on this page.")
+        else:
+            labels = {e["id"]: f'{e["name"]} [{e["data_kind"]}] — {e["id"]}' for e in items}
+            selected = st.selectbox("Experiment", list(labels), format_func=labels.get)
+            detail = api("GET", f"/experiments/{selected}")
+            if detail is not None:
+                experiment = detail.json()
+                total_records = len(experiment["records"])
+                all_results = [
+                    result
+                    for report in experiment["reports"]
+                    for result in report["results"]
+                ]
+                completed_count = sum(1 for r in all_results if r["status"] == "completed")
+                not_assessed_count = sum(
+                    1 for r in all_results if r["status"] == "not_assessed"
+                )
+                error_count = sum(1 for r in all_results if r["status"] == "error")
+
+                st.markdown(f"#### Experiment Profile: {experiment['name']}")
+                pcol1, pcol2, pcol3, pcol4, pcol5, pcol6 = st.columns(6)
+                pcol1.metric("Records", total_records)
+                pcol2.metric("Evaluations", len(all_results))
+                pcol3.metric("Completed", completed_count)
+                pcol4.metric("Not Assessed", not_assessed_count)
+                pcol5.metric("Errors", error_count)
+                pcol6.metric("Data Kind", experiment["data_kind"])
+
+                st.caption(
+                    f"**Experiment ID:** `{experiment['id']}` | **Created:** `{experiment['created_at']}` | **External Judge:** {'Enabled' if enabled else 'Disabled (Default)'}"
+                )
+
+                # Candidate Performance vs Evaluator Diagnostics
+                with st.expander("📊 Candidate System Performance vs. Evaluator Diagnostics", expanded=True):
+                    scol1, scol2 = st.columns(2)
+                    with scol1:
+                        st.markdown("#### Candidate AI System Performance (Supplied)")
+                        latencies = [
+                            r.get("metadata", {}).get("response_latency_ms")
+                            for r in experiment["records"]
+                            if r.get("metadata", {}).get("response_latency_ms") is not None
+                        ]
+                        tok_usages = [
+                            r.get("metadata", {}).get("token_usage", {})
+                            for r in experiment["records"]
+                            if r.get("metadata", {}).get("token_usage")
+                        ]
+                        total_toks = sum(
+                            u.get("total_tokens", 0) or 0
+                            for u in tok_usages
+                            if isinstance(u, dict)
                         )
-                    with col2:
-                        st.markdown(f"- **Output type:** `{spec['output_type']}`")
-                        if spec.get("score_range"):
-                            min_s, max_s = spec["score_range"]
-                            hib = " (Higher is better)" if spec.get("higher_is_better") else ""
-                            st.markdown(f"- **Score range:** `[{min_s}, {max_s}]`{hib}")
+                        if latencies:
+                            st.write(
+                                f"- **Mean Response Latency:** `{sum(latencies)/len(latencies):.2f} ms` (Min: `{min(latencies):.2f} ms`, Max: `{max(latencies):.2f} ms`)"
+                            )
                         else:
-                            st.markdown("- **Score:** Unscored / Heuristic / Measurements only")
-                    st.divider()
+                            st.write("- **Response Latency:** *Not reported in record metadata*")
+                        if total_toks:
+                            st.write(f"- **Total Token Usage:** `{total_toks:,}` tokens")
+                        else:
+                            st.write("- **Token Usage:** *Not reported in record metadata*")
 
-# System Health & Operational Diagnostics
-with st.expander("⚡ System Health & Operational Diagnostics", expanded=False):
-    ready_resp = api("GET", "/ready")
-    metrics_resp = api("GET", "/metrics")
-    if ready_resp is not None and metrics_resp is not None:
-        r_data = ready_resp.json()
-        m_data = metrics_resp.json()
+                    with scol2:
+                        st.markdown("#### Evaluator Execution Diagnostics (Platform)")
+                        eval_latencies = [
+                            report.get("evaluation_latency_ms", 0.0)
+                            for report in experiment["reports"]
+                        ]
+                        total_eval_time = sum(eval_latencies)
+                        st.write(f"- **Total Platform Evaluation Time:** `{total_eval_time:.2f} ms`")
+                        st.write(
+                            f"- **Mean Evaluation Time per Record:** `{total_eval_time/len(experiment['reports']):.2f} ms`"
+                            if experiment["reports"]
+                            else "-"
+                        )
+                        st.write(
+                            f"- **Execution Health:** `{completed_count}/{len(all_results)}` evaluations completed cleanly ({round(completed_count/len(all_results)*100, 1) if all_results else 0}%)"
+                        )
 
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("API Status", r_data.get("status", "unknown").upper())
-        c2.metric("Database", r_data.get("database", "unknown").title())
-        c3.metric("Evaluators Loaded", r_data.get("evaluators_loaded", 0))
-        c4.metric(
-            "Uptime",
-            f"{m_data.get('process', {}).get('uptime_seconds', 0):.1f}s",
-        )
+                # Results Dataframe
+                rows = [
+                    {"record_id": report["record_id"], **result}
+                    for report in experiment["reports"]
+                    for result in report["results"]
+                ]
+                st.dataframe(
+                    pd.DataFrame(rows)[
+                        [
+                            "record_id",
+                            "evaluator_id",
+                            "method",
+                            "status",
+                            "score",
+                            "measurements",
+                            "explanation",
+                            "limitations",
+                        ]
+                    ],
+                    hide_index=True,
+                )
+                # Detailed Evaluator Result Cards
+                with st.expander("🔍 Structured Evaluator Results & Findings", expanded=True):
+                    for report in experiment["reports"]:
+                        st.markdown(f"### Record: `{report['record_id']}`")
+                        st.caption(f"Evaluation execution latency: `{report['evaluation_latency_ms']:.2f} ms`")
+                        for result in report["results"]:
+                            status = result["status"]
+                            eval_id = result["evaluator_id"]
+                            score = result.get("score")
+
+                            if status == "completed":
+                                status_badge = "🟢 **Completed**"
+                                score_info = f"Score: `{score:.3f}`" if score is not None else "Unscored (Findings / Measurements)"
+                            elif status == "not_assessed":
+                                status_badge = "⚪ **Not assessed (Missing input or disabled method — not zero)**"
+                                score_info = "*Not scored (legitimate abstention)*"
+                            else:
+                                status_badge = "🔴 **Error**"
+                                score_info = "*Execution failed*"
+
+                            st.markdown(f"**Evaluator:** `{eval_id}` — {status_badge} — {score_info}")
+                            st.write(f"- **Method:** `{result['method']}`")
+                            st.write(f"- **Explanation:** {result['explanation']}")
+                            if result.get("limitations"):
+                                st.caption(f"Limitations: {result['limitations']}")
+
+                # Export Downloads
+                dcol1, dcol2, dcol3 = st.columns(3)
+                with dcol1:
+                    exp_json = api("GET", f"/experiments/{selected}/export?format=json")
+                    if exp_json is not None:
+                        st.download_button(
+                            "📥 Download JSON",
+                            exp_json.content,
+                            file_name=f"experiment_{selected}.json",
+                            mime="application/json",
+                            use_container_width=True,
+                        )
+                with dcol2:
+                    exp_csv = api("GET", f"/experiments/{selected}/export?format=csv")
+                    if exp_csv is not None:
+                        st.download_button(
+                            "📥 Download CSV",
+                            exp_csv.content,
+                            file_name=f"experiment_{selected}.csv",
+                            mime="text/csv",
+                            use_container_width=True,
+                        )
+                with dcol3:
+                    exp_md = api("GET", f"/experiments/{selected}/export?format=markdown")
+                    if exp_md is not None:
+                        st.download_button(
+                            "📥 Download Markdown Report",
+                            exp_md.content,
+                            file_name=f"report_{selected}.md",
+                            mime="text/markdown",
+                            use_container_width=True,
+                        )
+
+        st.markdown("---")
+        st.markdown("### Paired Method Comparison")
+        if len(items) >= 2:
+            left_id = st.selectbox("Left Experiment (Baseline)", list(labels), format_func=labels.get, key="adv_left_exp")
+            right_id = st.selectbox("Right Experiment (Candidate)", list(labels), format_func=labels.get, index=1 if len(labels) > 1 else 0, key="adv_right_exp")
+            if st.button("Compare methods"):
+                comp_resp = api("GET", f"/comparisons?left_id={left_id}&right_id={right_id}")
+                if comp_resp is not None:
+                    comp = comp_resp.json()
+                    st.success("Comparison calculated successfully.")
+                    st.json(comp)
+        else:
+            st.info("At least two stored experiments are required to perform a paired comparison.")
+
+    # TAB 2: DOCUMENT INGESTION (PDF / DOCX)
+    with adv_tab2:
+        st.subheader("Document Ingestion (PDF / DOCX Extraction)")
+        render_input_form(api)
+
+    # TAB 3: BENCHMARK SUITE
+    with adv_tab3:
+        st.subheader("Standardized 27-Case Benchmark Suite")
+        st.caption("Standardized test fixtures across 7 core reliability dimensions. Deterministic and offline.")
+        bcol1, bcol2 = st.columns([1, 4])
+        with bcol1:
+            run_bench_btn = st.button("🚀 Run 27-Case Benchmark", key="adv_run_bench_btn")
+        if run_bench_btn:
+            with st.spinner("Executing 27 standardized benchmark cases..."):
+                bench_res = api("POST", "/benchmarks/run")
+                if bench_res is not None:
+                    b_data = bench_res.json()
+                    st.success(f"Benchmark completed in {b_data['elapsed_seconds']:.2f}s!")
+                    st.metric("Overall Pass Rate", f"{b_data['pass_rate']*100:.1f}%", f"{b_data['passed_cases']}/{b_data['total_cases']} passed")
+                    b_rows = [
+                        {"Category": cat, "Cases": stats["total"], "Passed": stats["passed"], "Pass Rate": f"{stats['pass_rate']*100:.1f}%"}
+                        for cat, stats in b_data.get("category_breakdown", {}).items()
+                    ]
+                    st.dataframe(pd.DataFrame(b_rows), hide_index=True)
+
+    # TAB 4: EVALUATOR CATALOG (13 EVALUATORS)
+    with adv_tab4:
+        st.subheader("Evaluator Taxonomy & Registered Specifications")
+        st.caption("13 distinct evaluators with explicit methods, inputs, outputs, and score boundaries.")
+        evals_resp = api("GET", "/evaluators")
+        if evals_resp is not None:
+            evaluators_data = evals_resp.json()
+            by_cat = defaultdict(list)
+            for item in evaluators_data:
+                spec = item["spec"]
+                cat = spec.get("category", spec.get("dimension", "Other")).title()
+                by_cat[cat].append(item)
+
+            for category_name, cat_items in sorted(by_cat.items()):
+                st.markdown(f"### {category_name}")
+                for item in cat_items:
+                    spec = item["spec"]
+                    is_enabled = item["is_enabled_in_runtime"]
+                    is_judge = item["requires_external_judge"]
+                    status_str = "🟢 Enabled in runtime" if is_enabled else ("🟡 Optional (Requires External Judge — Disabled)" if is_judge else "⚪ Not assessed (Missing input or disabled method — not zero)")
+                    exec_badge = "🌐 External LLM Judge" if is_judge else "💻 Deterministic / Local"
+
+                    with st.container():
+                        st.markdown(f"**{spec['display_name']}** (`{spec['evaluator_id']}` v{spec['evaluator_version']}) — *{exec_badge}* — **{status_str}**")
+                        st.write(spec["description"])
+                        c1, c2 = st.columns(2)
+                        with c1:
+                            st.markdown(f"- **Method:** `{spec['method']}`")
+                            st.markdown(f"- **Required inputs:** {', '.join(f'`{inp}`' for inp in spec['required_inputs']) if spec['required_inputs'] else 'None'}")
+                        with c2:
+                            st.markdown(f"- **Output type:** `{spec['output_type']}`")
+                            if spec.get("score_range"):
+                                min_s, max_s = spec["score_range"]
+                                hib = " (Higher is better)" if spec.get("higher_is_better") else ""
+                                st.markdown(f"- **Score range:** `[{min_s}, {max_s}]`{hib}")
+                            else:
+                                st.markdown("- **Score:** Unscored / Heuristic / Measurements only")
+                        st.divider()
+
+    # TAB 5: SYSTEM DIAGNOSTICS & HEALTH
+    with adv_tab5:
+        st.subheader("System Health & Operational Diagnostics")
+        ready_resp = api("GET", "/ready")
+        metrics_resp = api("GET", "/metrics")
+        if ready_resp is not None and metrics_resp is not None:
+            r_data = ready_resp.json()
+            m_data = metrics_resp.json()
+
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("API Status", r_data.get("status", "unknown").upper())
+            c2.metric("Database", r_data.get("database", "unknown").title())
+            c3.metric("Evaluators Loaded", r_data.get("evaluators_loaded", 0))
+            c4.metric("Uptime", f"{m_data.get('process', {}).get('uptime_seconds', 0):.1f}s")

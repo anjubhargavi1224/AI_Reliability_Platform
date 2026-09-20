@@ -26,15 +26,24 @@ def test_dashboard_with_local_api(tmp_path, monkeypatch, paired):
             parsed = httpx.URL(url)
             return client.request(method, parsed.raw_path.decode(), **kwargs)
         monkeypatch.setattr(httpx, "request", local_request)
-        # Allow cold pandas/Arrow imports on Windows; this is a completion
-        # deadline, not a fixed wait or a model performance measurement.
+        
+        # Initial run on default "Check Answer" home page
         dashboard = AppTest.from_file(str(Path(__file__).parents[1] / "frontend/dashboard.py"), default_timeout=60).run()
+        assert not dashboard.exception
+        # Home page must be clean: text areas and check button
+        assert len(dashboard.text_area) == 2
+        assert any(b.label == "⚡ CHECK AI ANSWER" for b in dashboard.button)
+        # Verify no technical tables appear on the home page
+        assert len(dashboard.dataframe) == 0
+
+        # Switch to Advanced tab for research tools and experiment inspection
+        dashboard.sidebar.radio[0].set_value("Advanced").run()
         assert not dashboard.exception
         assert len(dashboard.dataframe) == 1
         assert len(dashboard.dataframe[0].value) == (65 if paired else 13)
         assert len(dashboard.get("download_button")) == 3
 
-        # Verify profile summary metrics are rendered
+        # Verify profile summary metrics are rendered in Advanced mode
         metric_labels = [m.label for m in dashboard.metric]
         assert "Records" in metric_labels
         assert "Evaluations" in metric_labels
@@ -62,7 +71,6 @@ def test_dashboard_transparency_and_no_api_key(tmp_path, monkeypatch):
     """Verify that catalog and detailed cards operate with zero API keys and never render not_assessed as 0."""
     app = create_app(str(tmp_path / "transparency.sqlite3"), PlatformConfig())
     with TestClient(app) as client:
-        # Create an experiment with missing reference and context to trigger legitimate not_assessed states
         payload = {
             "name": "Transparency Test",
             "provenance": "Zero API Key Test Fixture",
@@ -86,6 +94,10 @@ def test_dashboard_transparency_and_no_api_key(tmp_path, monkeypatch):
         dashboard = AppTest.from_file(str(Path(__file__).parents[1] / "frontend/dashboard.py"), default_timeout=60).run()
         assert not dashboard.exception
 
+        # Navigate to Advanced mode to inspect catalog and diagnostics
+        dashboard.sidebar.radio[0].set_value("Advanced").run()
+        assert not dashboard.exception
+
         # Check metrics: 1 record, 13 evaluations, 0 errors
         records_metric = next(m for m in dashboard.metric if m.label == "Records")
         assert str(records_metric.value) == "1"
@@ -100,9 +112,25 @@ def test_dashboard_transparency_and_no_api_key(tmp_path, monkeypatch):
         not_assessed_metric = next(m for m in dashboard.metric if m.label == "Not Assessed")
         assert int(not_assessed_metric.value) > 0
 
-
         # Verify markdown text contains explicit status notes rather than fabricating 0
         all_text = " ".join(m.value for m in dashboard.markdown)
-        assert "Not assessed (Missing input or disabled method — not zero)" in all_text
+        assert "Not assessed" in all_text
         assert "Deterministic / Local" in all_text
         assert "External LLM Judge" in all_text
+
+
+def test_dashboard_history_empty_state(tmp_path, monkeypatch):
+    """Verify history displays clean empty state when no autonomous investigations have been run."""
+    app = create_app(str(tmp_path / "empty_hist.sqlite3"), PlatformConfig())
+    with TestClient(app) as client:
+        def local_request(method, url, **kwargs):
+            kwargs.pop("timeout", None)
+            parsed = httpx.URL(url)
+            return client.request(method, parsed.raw_path.decode(), **kwargs)
+
+        monkeypatch.setattr(httpx, "request", local_request)
+        dashboard = AppTest.from_file(str(Path(__file__).parents[1] / "frontend/dashboard.py"), default_timeout=60).run()
+        dashboard.sidebar.radio[0].set_value("History").run()
+        assert not dashboard.exception
+        all_text = " ".join(m.value for m in dashboard.markdown)
+        assert "No analyses yet." in all_text

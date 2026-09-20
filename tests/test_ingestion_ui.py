@@ -19,6 +19,8 @@ def connect(monkeypatch, client):
 
 
 def fill(at):
+    if at.sidebar.radio and at.sidebar.radio[0].value != "Advanced":
+        at.sidebar.radio[0].set_value("Advanced").run()
     at.text_input(key="input_name").set_value("Synthetic UI ingestion")
     at.text_area(key="input_provenance").set_value("Hand-authored software fixture, no model calls")
     at.text_area(key="input_question").set_value("What rate?")
