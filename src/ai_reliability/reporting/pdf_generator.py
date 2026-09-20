@@ -19,7 +19,7 @@ from ai_reliability.investigation.models import InvestigationReport
 
 
 def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
-    """Generate a publication-quality PDF report from an InvestigationReport."""
+    """Generate a publication-quality PDF report from an InvestigationReport using Burgundy & Peach palette."""
     if isinstance(report, dict):
         report_data = report
     else:
@@ -36,6 +36,12 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     )
 
     styles = getSampleStyleSheet()
+
+    # Palette Constants:
+    # Deep Burgundy: #59171B
+    # Warm Peach: #FED7B8
+    # Rose/Wine: #8B263E, #A84252
+    # Off-white / Cream: #FFFBF8, #FDF4ED
     
     # Custom Typography Styles
     title_style = ParagraphStyle(
@@ -44,7 +50,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica-Bold",
         fontSize=20,
         leading=24,
-        textColor=colors.HexColor("#2A0845"),
+        textColor=colors.HexColor("#59171B"),
     )
     
     subtitle_style = ParagraphStyle(
@@ -53,7 +59,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica",
         fontSize=10,
         leading=13,
-        textColor=colors.HexColor("#64748B"),
+        textColor=colors.HexColor("#7A3E45"),
     )
     
     h2_style = ParagraphStyle(
@@ -62,7 +68,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica-Bold",
         fontSize=12,
         leading=15,
-        textColor=colors.HexColor("#1E293B"),
+        textColor=colors.HexColor("#3D0E12"),
         spaceBefore=12,
         spaceAfter=6,
     )
@@ -73,7 +79,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica",
         fontSize=9.5,
         leading=13,
-        textColor=colors.HexColor("#334155"),
+        textColor=colors.HexColor("#2D1518"),
     )
 
     bold_label_style = ParagraphStyle(
@@ -82,7 +88,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica-Bold",
         fontSize=9.5,
         leading=13,
-        textColor=colors.HexColor("#1E293B"),
+        textColor=colors.HexColor("#3D0E12"),
     )
 
     quote_style = ParagraphStyle(
@@ -91,7 +97,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica-Oblique",
         fontSize=9,
         leading=12,
-        textColor=colors.HexColor("#475569"),
+        textColor=colors.HexColor("#5C2B30"),
     )
 
     link_style = ParagraphStyle(
@@ -100,7 +106,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         fontName="Helvetica-Bold",
         fontSize=8.5,
         leading=11,
-        textColor=colors.HexColor("#0284C7"),
+        textColor=colors.HexColor("#8B263E"),
     )
 
     story = []
@@ -114,7 +120,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     meta_text = f"Generated on <strong>{created_at[:10]}</strong> | Target AI: <strong>{model_name}</strong> | Reference ID: <strong>{rep_id}</strong>"
     story.append(Paragraph(meta_text, subtitle_style))
     story.append(Spacer(1, 10))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#4B0082"), spaceAfter=12))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#59171B"), spaceAfter=12))
 
     # 2. Inquiry & Response Summary Box
     q_text = report_data.get("question", "").replace("<", "&lt;").replace(">", "&gt;")
@@ -134,9 +140,9 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     inquiry_table = Table(inquiry_data, colWidths=[110, 420])
     inquiry_table.setStyle(
         TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
-            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#E2E8F0")),
-            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FDF7F3")),
+            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#EBD5C9")),
+            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#EBD5C9")),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
             ("LEFTPADDING", (0, 0), (-1, -1), 10),
@@ -163,9 +169,9 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     findings_table = Table(findings_data, colWidths=[530])
     findings_table.setStyle(
         TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F1F5F9")),
-            ("LINELEFT", (0, 0), (-1, -1), 3.5, colors.HexColor("#4B0082")),
-            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#CBD5E1")),
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FAF0EA")),
+            ("LINELEFT", (0, 0), (-1, -1), 3.5, colors.HexColor("#59171B")),
+            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#E2C3B5")),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
             ("LEFTPADDING", (0, 0), (-1, -1), 12),
@@ -197,17 +203,17 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
                 badge_fg = colors.HexColor("#166534")
                 border_col = colors.HexColor("#22C55E")
             elif c_status == "contradicted":
-                badge_bg = colors.HexColor("#FEE2E2")
-                badge_fg = colors.HexColor("#991B1B")
-                border_col = colors.HexColor("#EF4444")
+                badge_bg = colors.HexColor("#FFE4E6")
+                badge_fg = colors.HexColor("#9F1239")
+                border_col = colors.HexColor("#E11D48")
             elif c_status == "partially_supported":
                 badge_bg = colors.HexColor("#FEF3C7")
                 badge_fg = colors.HexColor("#92400E")
                 border_col = colors.HexColor("#F59E0B")
             else:
-                badge_bg = colors.HexColor("#F3E8FF")
-                badge_fg = colors.HexColor("#6B21A8")
-                border_col = colors.HexColor("#A855F7")
+                badge_bg = colors.HexColor("#FED7B8")
+                badge_fg = colors.HexColor("#59171B")
+                border_col = colors.HexColor("#8B263E")
 
             badge_p = Paragraph(
                 f"<font color='{badge_fg.hexval()}'><strong>[{c_label.upper()}]</strong></font>",
@@ -242,7 +248,7 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
             claim_table.setStyle(
                 TableStyle([
                     ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FFFFFF")),
-                    ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#E2E8F0")),
+                    ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#EBD5C9")),
                     ("LINELEFT", (0, 0), (0, -1), 3, border_col),
                     ("TOPPADDING", (0, 0), (-1, -1), 6),
                     ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
@@ -278,17 +284,17 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
             s_snippet = s.get("snippet", "").replace("<", "&lt;").replace(">", "&gt;")[:180] + "..."
 
             safe_url = s_url.replace("&", "&amp;")
-            title_p = Paragraph(f"<a href='{safe_url}'><strong>{s_title}</strong></a><br/><font color='#64748B' size='7'>{s_domain}</font>", body_style)
+            title_p = Paragraph(f"<a href='{safe_url}'><strong>{s_title}</strong></a><br/><font color='#7A3E45' size='7'>{s_domain}</font>", body_style)
             type_p = Paragraph(f"<font size='8'>{s_type}</font>", body_style)
-            snip_p = Paragraph(f"<font size='8' color='#475569'>{s_snippet}</font>", body_style)
+            snip_p = Paragraph(f"<font size='8' color='#5C2B30'>{s_snippet}</font>", body_style)
             source_rows.append([title_p, type_p, snip_p])
 
         sources_table = Table(source_rows, colWidths=[180, 80, 270])
         sources_table.setStyle(
             TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
-                ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#CBD5E1")),
-                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#FAF0EA")),
+                ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#E2C3B5")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#EBD5C9")),
                 ("TOPPADDING", (0, 0), (-1, -1), 5),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
                 ("LEFTPADDING", (0, 0), (-1, -1), 6),
@@ -312,10 +318,10 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
         story.append(Spacer(1, 3))
 
     story.append(Spacer(1, 10))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#CBD5E1"), spaceAfter=8))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#E2C3B5"), spaceAfter=8))
     story.append(
         Paragraph(
-            "<font size='7.5' color='#94A3B8'>AI Reliability Platform — Evidence-Based Verification — Confidential & Protected. No API credentials or private tokens are contained in this document.</font>",
+            "<font size='7.5' color='#8A525A'>AI Reliability Platform — Evidence-Based Verification — Confidential & Protected. No API credentials or private tokens are contained in this document.</font>",
             body_style,
         )
     )
