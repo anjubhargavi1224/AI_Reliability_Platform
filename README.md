@@ -1,6 +1,45 @@
-# AI Reliability and Performance Platform
+# Autonomous Evidence-Based AI Reliability Checker
 
-Evaluate **supplied** LLM, RAG, agent, or research responses with explicit methods, measurements, limitations, and `completed`, `not_assessed`, or `error` states. The platform does not compute an overall reliability score or generate candidate model responses. Agent/research records currently receive response-level evaluation, not tool-trace or workflow evaluation.
+> **This platform checks AI-generated answers against relevant evidence from trusted sources. You provide the question and the AI's answer. The platform investigates the claims, evaluates their support, and produces an analysis report with the sources used.**
+
+The AI Reliability & Evaluation Platform provides an autonomous, evidence-grounded investigation pipeline that turns user questions and AI-generated answers into clear, claim-by-claim reliability reports with verifiable, clickable citations.
+
+Underneath this simple user-facing experience lies a comprehensive evaluation and benchmarking architecture featuring 13 distinct evaluators, deterministic & offline benchmark suites, paired experiment comparison, document ingestion (PDF/DOCX), SQLite persistence, and production observability.
+
+---
+
+## 🚀 Quick Start (Autonomous AI Reliability Checker)
+
+### 1. Launch the Backend API
+In Windows PowerShell from the workspace root:
+```powershell
+$env:AI_RELIABILITY_CONFIG = "configs/example.json"
+$env:AI_RELIABILITY_DB = "data/results/platform.sqlite3"
+.\.venv\Scripts\python.exe -m uvicorn ai_reliability.api:app --host 127.0.0.1 --port 8000
+```
+
+### 2. Launch the Streamlit Dashboard
+In a second terminal:
+```powershell
+$env:AI_RELIABILITY_API_URL = "http://127.0.0.1:8000"
+.\.venv\Scripts\python.exe -m streamlit run frontend/dashboard.py --server.address 127.0.0.1 --server.port 8501
+```
+Open `http://127.0.0.1:8501` to use the interactive **AI Reliability Checker**.
+
+---
+
+## 🔍 How It Works
+
+1. **Input**: Enter the question asked to the AI and paste the AI's answer (optional model tag).
+2. **Investigation**:
+   - Understands the question and extracts claim-level propositions.
+   - Autonomously retrieves external, authoritative evidence via Wikipedia, DuckDuckGo, or configured search engines (zero fabricated URLs).
+   - Evaluates each claim for support, contradiction, or insufficient evidence.
+   - Runs applicable reliability evaluators across factuality, consistency, safety, and grounding.
+   - Persists the experiment run to SQLite.
+3. **Report**: Delivers a human-readable assessment with claim breakdown, reliability dimensions, and verified clickable source links.
+
+---
 
 ## Windows PowerShell setup
 
@@ -15,6 +54,7 @@ py -3.12 -m venv .venv
 ```
 
 Direct interpreter paths avoid activation/execution-policy changes. `requirements-lock.txt` preserves the existing pinned environment; `requirements.txt` contains the direct dependencies. The test command disables pytest's optional cache because this workspace's existing cache directory may be read-only.
+
 
 ## Run an offline batch
 

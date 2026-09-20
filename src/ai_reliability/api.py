@@ -36,6 +36,8 @@ from ai_reliability.benchmarks.runner import (
     export_benchmark_csv,
 )
 from ai_reliability.metrics.collector import default_collector
+from ai_reliability.investigation.models import InvestigationRequest, InvestigationReport
+from ai_reliability.investigation.service import InvestigationService
 
 logger = logging.getLogger("ai_reliability")
 _extraction_slots = BoundedSemaphore(2)
@@ -132,6 +134,11 @@ def create_app(db_path=None, config=None):
             summaries = [s for s in summaries if s.is_enabled_in_runtime]
         return summaries
 
+    @app.post("/analyze", response_model=InvestigationReport)
+    def analyze(request: InvestigationRequest):
+        """Autonomously investigate an AI answer against external evidence sources."""
+        service = InvestigationService(config=settings)
+        return service.investigate(request, store=store())
 
     @app.post("/documents/extract")
     async def extract(request: Request, filename: str = Query(..., min_length=1, max_length=255), role: Literal["answer", "evidence"] = Query(...)):

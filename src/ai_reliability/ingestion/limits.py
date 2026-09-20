@@ -2,6 +2,7 @@
 from starlette.responses import JSONResponse
 
 ROUTE_LIMITS = {
+    "/analyze": 2 * 1024 * 1024,
     "/documents/paste": 2 * 1024 * 1024,
     "/form-experiments": 2 * 1024 * 1024,
     "/documents/extract": 5 * 1024 * 1024,
