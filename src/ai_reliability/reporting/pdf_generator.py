@@ -112,14 +112,16 @@ def generate_investigation_pdf(report: InvestigationReport | dict) -> bytes:
     story = []
 
     # 1. Header Banner
-    story.append(Paragraph("AI Reliability Analysis Report", title_style))
+    story.append(Paragraph("VERITY AI &mdash; AI Reliability Analysis", title_style))
+    story.append(Paragraph("<i>See what AI can actually prove.</i>", quote_style))
+    story.append(Spacer(1, 4))
     created_at = report_data.get("created_at") or datetime.now(timezone.utc).isoformat()
     model_name = report_data.get("model") or "Unspecified Model"
     rep_id = report_data.get("id", "N/A")[:8]
     
-    meta_text = f"Generated on <strong>{created_at[:10]}</strong> | Target AI: <strong>{model_name}</strong> | Reference ID: <strong>{rep_id}</strong>"
+    meta_text = f"Analysis Date: <strong>{created_at[:10]}</strong> | Target Model: <strong>{model_name}</strong> | Verification ID: <strong>{rep_id}</strong>"
     story.append(Paragraph(meta_text, subtitle_style))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
     story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#59171B"), spaceAfter=12))
 
     # 2. Inquiry & Response Summary Box

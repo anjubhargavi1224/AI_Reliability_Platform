@@ -1,6 +1,8 @@
-"""Streamlit client for the AI Reliability Checker and Evaluation Platform."""
+"""Streamlit client for the VERITY AI — Evidence-Based AI Reliability Platform."""
+import base64
 import json
 import os
+from pathlib import Path
 import time
 from collections import defaultdict
 import httpx
@@ -9,17 +11,25 @@ import streamlit as st
 from ai_reliability.ingestion.ui import render_input_form
 
 st.set_page_config(
-    page_title="AI Reliability Checker",
-    page_icon="⚡",
+    page_title="VERITY AI — See what AI can actually prove",
+    page_icon="✦",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# Reference Design: Deep Burgundy (#59171B), Warm Peach (#FED7B8), Rose (#A84252), Dark Background (#0E0406)
+# Load Robot Hero Base64 image
+ROBOT_IMAGE_PATH = Path(__file__).parent / "assets" / "verity_robot_hero.png"
+if ROBOT_IMAGE_PATH.exists():
+    with open(ROBOT_IMAGE_PATH, "rb") as f:
+        ROBOT_B64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+else:
+    ROBOT_B64 = ""
+
+# Cinematic Design: Deep Burgundy (#59171B), Warm Peach (#FED7B8), Rose/Wine (#8B263E, #C45564), Near-Black (#0E0406)
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -29,85 +39,297 @@ st.markdown(
         font-family: 'JetBrains Mono', monospace !important;
     }
 
-    /* Futuristic Dark Burgundy Background with Glowing Atmospheric Elements */
+    /* Cinematic Deep Burgundy / Near-Black Background with Atmospheric Depth */
     .stApp {
         background-color: #0E0406;
         background-image: 
-            radial-gradient(circle at 18% 18%, rgba(89, 23, 27, 0.42) 0%, transparent 45%),
-            radial-gradient(circle at 82% 20%, rgba(254, 215, 184, 0.12) 0%, transparent 40%),
-            radial-gradient(circle at 50% 88%, rgba(139, 38, 62, 0.22) 0%, transparent 50%),
-            radial-gradient(circle at 85% 75%, rgba(89, 23, 27, 0.3) 0%, transparent 45%);
+            radial-gradient(circle at 50% 12%, rgba(254, 215, 184, 0.14) 0%, transparent 35%),
+            radial-gradient(circle at 50% 28%, rgba(89, 23, 27, 0.55) 0%, transparent 55%),
+            radial-gradient(circle at 15% 45%, rgba(139, 38, 62, 0.25) 0%, transparent 45%),
+            radial-gradient(circle at 85% 65%, rgba(89, 23, 27, 0.35) 0%, transparent 45%),
+            radial-gradient(circle at 50% 90%, rgba(89, 23, 27, 0.4) 0%, transparent 50%);
         background-attachment: fixed;
         color: #FFF5EE;
     }
 
-    /* Hero Section */
-    .hero-container {
-        text-align: center;
-        padding: 24px 12px 28px 12px;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    .hero-pretitle {
-        display: inline-flex;
+    /* Top Minimal Navigation Bar */
+    .verity-nav {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 6px;
-        background: rgba(254, 215, 184, 0.08);
-        color: #FED7B8;
-        font-size: 0.74rem;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        padding: 6px 14px;
-        border-radius: 30px;
-        border: 1px solid rgba(254, 215, 184, 0.2);
-        margin-bottom: 16px;
+        padding: 14px 28px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(254, 215, 184, 0.1);
+        backdrop-filter: blur(16px);
+        background: rgba(14, 4, 6, 0.45);
+        border-radius: 16px;
+    }
+    .verity-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: #FFFFFF;
         text-transform: uppercase;
     }
-    .hero-heading {
-        font-size: 3.2rem;
+    .verity-brand-mark {
+        color: #FED7B8;
+        font-size: 1.25rem;
+        filter: drop-shadow(0 0 8px rgba(254, 215, 184, 0.6));
+    }
+    .verity-nav-links {
+        display: flex;
+        gap: 28px;
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: #D6ADA0;
+    }
+    .verity-nav-links span {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    .verity-nav-links span:hover, .verity-nav-links span.active {
+        color: #FED7B8;
+    }
+    .verity-nav-cta {
+        background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
+        color: #2D080C;
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 8px 18px;
+        border-radius: 24px;
+        letter-spacing: 0.02em;
+        box-shadow: 0 4px 16px rgba(254, 215, 184, 0.2);
+    }
+
+    /* Cinematic Hero Layout with Giant Background Typography & Robot */
+    .hero-wrapper {
+        position: relative;
+        padding: 20px 0 30px 0;
+        overflow: hidden;
+    }
+    .hero-giant-bg-text-top {
+        position: absolute;
+        top: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(3.5rem, 8.5vw, 7.8rem);
+        font-weight: 800;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: -0.04em;
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 1;
+        text-shadow: 0 0 40px rgba(254, 215, 184, 0.2);
+    }
+    .hero-giant-bg-text-bottom {
+        position: absolute;
+        top: 22%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(3.5rem, 8.5vw, 7.8rem);
+        font-weight: 800;
+        color: rgba(254, 215, 184, 0.12);
+        letter-spacing: -0.04em;
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .hero-composition {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.15fr 1.2fr 0.85fr;
+        align-items: center;
+        min-height: 440px;
+        z-index: 2;
+        gap: 20px;
+    }
+    .hero-left-content {
+        padding-top: 20px;
+        z-index: 3;
+    }
+    .hero-eyebrow {
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: #FED7B8;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        display: inline-block;
+    }
+    .hero-main-title {
+        font-size: clamp(2.4rem, 4.2vw, 3.8rem);
         font-weight: 800;
         color: #FFFFFF;
-        line-height: 1.15;
+        line-height: 1.12;
         letter-spacing: -0.04em;
         margin: 0 0 16px 0;
     }
-    .hero-heading span.gradient-text {
-        background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
+    .hero-main-title span.gradient-text {
+        background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .hero-subtext {
-        font-size: 1.1rem;
+    .hero-description {
+        font-size: 1.05rem;
         color: #E2C2B2;
         line-height: 1.55;
-        margin: 0 auto 10px auto;
-        max-width: 680px;
+        margin: 0 0 24px 0;
+        max-width: 440px;
         font-weight: 400;
     }
+    .hero-buttons {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .hero-btn-primary {
+        background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%);
+        color: #2D080C;
+        font-weight: 800;
+        font-size: 0.95rem;
+        padding: 12px 24px;
+        border-radius: 28px;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(254, 215, 184, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .hero-btn-secondary {
+        background: rgba(254, 215, 184, 0.06);
+        color: #FED7B8;
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 11px 22px;
+        border-radius: 28px;
+        border: 1px solid rgba(254, 215, 184, 0.22);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-    /* Form Labels & Inputs */
+    /* Centered Robot Visual in Hero */
+    .hero-robot-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+    .robot-glow-aura {
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(254, 215, 184, 0.28) 0%, rgba(89, 23, 27, 0.45) 45%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(28px);
+        z-index: -1;
+    }
+    .robot-img {
+        max-width: 100%;
+        height: auto;
+        max-height: 420px;
+        filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 25px rgba(89, 23, 27, 0.4));
+        user-select: none;
+    }
+
+    /* Floating Metric Badges on Right of Hero */
+    .hero-right-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: flex-start;
+        padding-left: 20px;
+        z-index: 3;
+    }
+    .hero-metric-tag {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: #FED7B8;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    .hero-metric-pill {
+        background: rgba(30, 9, 13, 0.65);
+        border: 1px solid rgba(254, 215, 184, 0.16);
+        border-radius: 16px;
+        padding: 14px 20px;
+        backdrop-filter: blur(14px);
+        min-width: 130px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .hero-metric-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    .hero-metric-label {
+        font-size: 0.78rem;
+        color: #D6ADA0;
+        font-weight: 500;
+    }
+
+    /* Console Container ("Ask Verity") */
+    .checker-console {
+        background: rgba(24, 7, 11, 0.65);
+        border: 1px solid rgba(254, 215, 184, 0.18);
+        border-radius: 20px;
+        padding: 26px 30px;
+        margin: 10px auto 36px auto;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(254, 215, 184, 0.15);
+    }
+    .console-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .console-header-icon {
+        color: #FED7B8;
+        font-size: 1.25rem;
+    }
+    .console-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin: 0;
+    }
+    .console-subtitle {
+        font-size: 0.88rem;
+        color: #D6ADA0;
+        margin-left: 6px;
+    }
+
+    /* Input Fields */
     .field-label {
-        font-size: 0.94rem;
+        font-size: 0.88rem;
         font-weight: 700;
         color: #FED7B8;
-        margin: 12px 0 6px 0;
+        margin: 0 0 6px 0;
         letter-spacing: -0.01em;
     }
     .stTextArea textarea, .stTextInput input {
-        background: rgba(18, 5, 8, 0.72) !important;
-        border: 1px solid rgba(254, 215, 184, 0.18) !important;
+        background: rgba(12, 3, 5, 0.75) !important;
+        border: 1px solid rgba(254, 215, 184, 0.16) !important;
         border-radius: 12px !important;
         color: #FFF5EE !important;
-        font-size: 0.98rem !important;
+        font-size: 0.96rem !important;
         transition: all 0.25s ease !important;
     }
     .stTextArea textarea:focus, .stTextInput input:focus {
         border-color: #FED7B8 !important;
-        box-shadow: 0 0 0 3px rgba(254, 215, 184, 0.22) !important;
-        background: rgba(24, 7, 11, 0.85) !important;
+        box-shadow: 0 0 0 3px rgba(254, 215, 184, 0.2) !important;
+        background: rgba(18, 5, 8, 0.9) !important;
     }
 
-    /* Primary Action Button (Warm Peach / Rose Gradient) */
+    /* Primary Gradient Button */
     button[kind="primary"], .stButton > button {
         background: linear-gradient(135deg, #FED7B8 0%, #E89E88 45%, #C45564 100%) !important;
         color: #2D080C !important;
@@ -116,69 +338,166 @@ st.markdown(
         font-size: 1.05rem !important;
         letter-spacing: 0.02em !important;
         border-radius: 12px !important;
-        padding: 14px 32px !important;
-        box-shadow: 0 6px 24px rgba(254, 215, 184, 0.25) !important;
+        padding: 14px 34px !important;
+        box-shadow: 0 6px 24px rgba(254, 215, 184, 0.28) !important;
         transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     button[kind="primary"]:hover, .stButton > button:hover {
         background: linear-gradient(135deg, #FFFFFF 0%, #FED7B8 50%, #D87B85 100%) !important;
-        box-shadow: 0 8px 30px rgba(254, 215, 184, 0.45) !important;
+        box-shadow: 0 8px 32px rgba(254, 215, 184, 0.45) !important;
         transform: translateY(-2px) !important;
         color: #1A0407 !important;
     }
 
-    /* Secondary Download Button */
-    .stDownloadButton > button {
-        background: rgba(254, 215, 184, 0.08) !important;
-        color: #FED7B8 !important;
-        border: 1px solid rgba(254, 215, 184, 0.3) !important;
-        font-weight: 700 !important;
-        font-size: 0.95rem !important;
-        border-radius: 10px !important;
-        padding: 10px 22px !important;
-        transition: all 0.2s ease !important;
-    }
-    .stDownloadButton > button:hover {
-        background: rgba(254, 215, 184, 0.18) !important;
-        border-color: #FED7B8 !important;
-        color: #FFFFFF !important;
-        transform: translateY(-1px) !important;
-    }
-
-    /* 3 Supporting Feature Cards (Matching Reference Layout) */
+    /* 3 Feature Cards (Matching Reference Layout Exactly) */
     .feature-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin: 10px auto 40px auto;
-        max-width: 900px;
+        gap: 20px;
+        margin: 20px 0 50px 0;
     }
     .feature-card {
-        background: rgba(30, 9, 13, 0.5);
+        background: rgba(24, 7, 11, 0.55);
         border: 1px solid rgba(254, 215, 184, 0.12);
-        border-radius: 16px;
-        padding: 22px 20px;
+        border-radius: 18px;
+        padding: 26px 24px;
         transition: all 0.25s ease;
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(14px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 250px;
     }
     .feature-card:hover {
         border-color: rgba(254, 215, 184, 0.3);
-        background: rgba(45, 14, 20, 0.65);
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(89, 23, 27, 0.25);
+        background: rgba(38, 11, 17, 0.7);
+        transform: translateY(-4px);
+        box-shadow: 0 14px 35px rgba(89, 23, 27, 0.35);
     }
-    .feature-icon {
-        font-size: 1.4rem;
-        margin-bottom: 10px;
+    .feature-visual {
+        min-height: 80px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .feature-title {
-        font-size: 1.05rem;
+        font-size: 1.12rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-bottom: 8px;
+    }
+    .feature-desc {
+        font-size: 0.9rem;
+        color: #D6ADA0;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+    .feature-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: rgba(254, 215, 184, 0.6);
+        border-top: 1px solid rgba(254, 215, 184, 0.08);
+        padding-top: 12px;
+    }
+    .feature-card-arrow {
+        color: #FED7B8;
+        font-size: 1.1rem;
+    }
+
+    /* "From AI Answer to Evidence" Section */
+    .process-section {
+        margin: 40px 0 60px 0;
+        padding-top: 20px;
+    }
+    .process-header-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: flex-end;
+        margin-bottom: 32px;
+    }
+    .process-main-heading {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        margin: 0;
+    }
+    .process-main-heading span.gradient-text {
+        background: linear-gradient(135deg, #FED7B8 0%, #E89E88 50%, #C45564 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .process-subtext {
+        font-size: 1.02rem;
+        color: #D6ADA0;
+        line-height: 1.5;
+        margin: 0 0 10px 0;
+    }
+    .process-learn-more {
+        color: #FED7B8;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .process-steps-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        position: relative;
+    }
+    .process-step-card {
+        background: rgba(24, 7, 11, 0.55);
+        border: 1px solid rgba(254, 215, 184, 0.12);
+        border-radius: 16px;
+        padding: 22px 18px;
+        backdrop-filter: blur(12px);
+        transition: all 0.22s ease;
+    }
+    .process-step-card:hover {
+        border-color: rgba(254, 215, 184, 0.3);
+        background: rgba(35, 10, 15, 0.7);
+        transform: translateY(-3px);
+    }
+    .step-badge {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+    .step-number {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #FED7B8;
+    }
+    .step-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(254, 215, 184, 0.08);
+        border: 1px solid rgba(254, 215, 184, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        color: #FED7B8;
+    }
+    .step-title {
+        font-size: 1.15rem;
         font-weight: 700;
         color: #FFFFFF;
         margin-bottom: 6px;
     }
-    .feature-desc {
-        font-size: 0.88rem;
+    .step-desc {
+        font-size: 0.86rem;
         color: #D6ADA0;
         line-height: 1.45;
         margin: 0;
@@ -186,30 +505,29 @@ st.markdown(
 
     /* Analysis Result Cards */
     .report-card {
-        background: rgba(30, 9, 13, 0.75);
-        border: 1px solid rgba(254, 215, 184, 0.16);
+        background: rgba(30, 9, 13, 0.8);
+        border: 1px solid rgba(254, 215, 184, 0.18);
         border-top: 3px solid #FED7B8;
-        border-radius: 14px;
-        padding: 22px 26px;
-        margin: 18px 0;
-        backdrop-filter: blur(14px);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin: 20px 0;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     }
-
     .q-and-a-card {
-        background: rgba(24, 7, 11, 0.6);
+        background: rgba(24, 7, 11, 0.65);
         border: 1px solid rgba(254, 215, 184, 0.12);
-        border-radius: 12px;
-        padding: 16px 20px;
+        border-radius: 14px;
+        padding: 18px 22px;
         margin-bottom: 14px;
     }
-
     .claim-card {
-        background: rgba(30, 9, 13, 0.65);
+        background: rgba(30, 9, 13, 0.7);
         border: 1px solid rgba(254, 215, 184, 0.12);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-bottom: 12px;
-        backdrop-filter: blur(10px);
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 14px;
+        backdrop-filter: blur(12px);
     }
     .claim-card-supported {
         border-left: 4px solid #22C55E;
@@ -258,9 +576,9 @@ st.markdown(
     .source-card {
         background: rgba(24, 7, 11, 0.65);
         border: 1px solid rgba(254, 215, 184, 0.12);
-        border-radius: 12px;
-        padding: 14px 18px;
-        margin-bottom: 10px;
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
     }
     .source-title {
         color: #FED7B8;
@@ -273,7 +591,25 @@ st.markdown(
         text-decoration: underline;
     }
 
-    /* Streamlit Sidebar & Radio Styling */
+    /* Download PDF Button Styling */
+    .stDownloadButton > button {
+        background: rgba(254, 215, 184, 0.08) !important;
+        color: #FED7B8 !important;
+        border: 1px solid rgba(254, 215, 184, 0.3) !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+        padding: 10px 22px !important;
+        transition: all 0.2s ease !important;
+    }
+    .stDownloadButton > button:hover {
+        background: rgba(254, 215, 184, 0.18) !important;
+        border-color: #FED7B8 !important;
+        color: #FFFFFF !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Streamlit Sidebar Styling */
     [data-testid="stSidebar"] {
         background-color: #0A0304 !important;
         border-right: 1px solid rgba(254, 215, 184, 0.1) !important;
@@ -314,10 +650,10 @@ enabled = health.json().get("external_judge_enabled", False) if health is not No
 st.sidebar.markdown(
     """
     <div style="padding: 6px 0 14px 0;">
-        <div style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em;">
-            ⚡ <span style="color: #FED7B8;">AI Reliability</span>
+        <div style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.08em;">
+            ✦ <span style="color: #FED7B8;">VERITY AI</span>
         </div>
-        <div style="font-size: 0.78rem; color: #D6ADA0; margin-top: 2px;">Evidence-Based Checker</div>
+        <div style="font-size: 0.78rem; color: #D6ADA0; margin-top: 2px;">See what AI can actually prove.</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -331,85 +667,249 @@ nav_page = st.sidebar.radio(
 
 
 # =============================================================
-# 1. PRIMARY PAGE: CHECK ANSWER (HERO + MAIN CHECKER)
+# 1. PRIMARY PAGE: CHECK ANSWER (HERO + ROBOT + CONSOLE)
 # =============================================================
 if nav_page == "Check Answer":
+    # Top Navigation Banner
     st.markdown(
         """
-        <div class="hero-container">
-            <div class="hero-pretitle">✦ THE FUTURE OF AI TRUST ✦</div>
-            <h1 class="hero-heading">Know When AI Is <span class="gradient-text">Right.</span></h1>
-            <p class="hero-subtext">Check AI-generated answers against real evidence and see exactly what is supported, uncertain, or contradicted.</p>
+        <div class="verity-nav">
+            <div class="verity-brand">
+                <span class="verity-brand-mark">✦</span> VERITY AI
+            </div>
+            <div class="verity-nav-links">
+                <span class="active">Check Answer</span>
+                <span>History</span>
+                <span>Advanced</span>
+            </div>
+            <div class="verity-nav-cta">
+                Get Started →
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Main Checker Interaction Inputs
-    st.markdown('<div class="field-label">What did you ask the AI?</div>', unsafe_allow_html=True)
-    user_question = st.text_area(
-        "What did you ask the AI?",
-        placeholder="Example: What is Apple's return policy for iPhones?",
-        height=110,
-        key="chk_question",
-        label_visibility="collapsed",
+    # Hero Section with Giant Background Typography & Robot
+    robot_html = f'<img src="{ROBOT_B64}" class="robot-img" alt="Verity AI Robot">' if ROBOT_B64 else '<div style="font-size: 5rem; text-align: center;">🤖</div>'
+
+    st.markdown(
+        f"""
+        <div class="hero-wrapper">
+            <div class="hero-giant-bg-text-top">— the future —</div>
+            <div class="hero-giant-bg-text-bottom">of thinking</div>
+            <div class="hero-composition">
+                <div class="hero-left-content">
+                    <div class="hero-eyebrow">VERITY AI</div>
+                    <h1 class="hero-main-title">
+                        See what AI<br>can actually <span class="gradient-text">prove.</span>
+                    </h1>
+                    <p class="hero-description">
+                        Verity AI checks AI-generated answers against real evidence and shows you exactly what is supported, uncertain, or contradicted.
+                    </p>
+                    <div class="hero-buttons">
+                        <span class="hero-btn-primary">Check an AI Answer →</span>
+                        <span class="hero-btn-secondary">▷ How It Works</span>
+                    </div>
+                </div>
+                <div class="hero-robot-center">
+                    <div class="robot-glow-aura"></div>
+                    {robot_html}
+                </div>
+                <div class="hero-right-metrics">
+                    <div class="hero-metric-tag">REAL EVIDENCE. REAL ANSWERS.</div>
+                    <div class="hero-metric-pill">
+                        <div class="hero-metric-number">300+</div>
+                        <div class="hero-metric-label">Processed Claims</div>
+                    </div>
+                    <div class="hero-metric-pill">
+                        <div class="hero-metric-number">13</div>
+                        <div class="hero-metric-label">Evaluation Signals</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="field-label">What did the AI answer?</div>', unsafe_allow_html=True)
-    user_answer = st.text_area(
-        "What did the AI answer?",
-        placeholder="Paste the AI-generated answer here...",
-        height=150,
-        key="chk_answer",
-        label_visibility="collapsed",
+    # Main Checker Interaction Console ("Ask Verity")
+    st.markdown(
+        """
+        <div class="console-header" style="margin-top: 20px;">
+            <span class="console-header-icon">✦</span>
+            <h2 class="console-title">Ask Verity</h2>
+            <span class="console-subtitle">Paste a question and an AI answer. We'll do the checking.</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="field-label">AI model (optional)</div>', unsafe_allow_html=True)
-    user_model = st.text_input(
-        "AI model (optional)",
-        placeholder="ChatGPT, Gemini, Claude...",
-        key="chk_model",
-        label_visibility="collapsed",
-    )
+    # 2-Column Textareas for Question & Answer
+    col_input_q, col_input_a = st.columns(2)
+    with col_input_q:
+        st.markdown('<div class="field-label">What did you ask the AI?</div>', unsafe_allow_html=True)
+        user_question = st.text_area(
+            "What did you ask the AI?",
+            placeholder="Example: What is Apple's return policy for iPhones?",
+            height=125,
+            key="chk_question",
+            label_visibility="collapsed",
+        )
+    with col_input_a:
+        st.markdown('<div class="field-label">What did the AI answer?</div>', unsafe_allow_html=True)
+        user_answer = st.text_area(
+            "What did the AI answer?",
+            placeholder="Paste the AI-generated answer here...",
+            height=125,
+            key="chk_answer",
+            label_visibility="collapsed",
+        )
 
-    st.write("")
-    check_btn = st.button("Check AI Answer →", type="primary", use_container_width=True)
+    # Bottom Row: Model input (left) + Primary Action Button (right)
+    col_model, col_btn = st.columns([1.5, 1])
+    with col_model:
+        st.markdown('<div class="field-label">AI model (optional)</div>', unsafe_allow_html=True)
+        user_model = st.text_input(
+            "AI model (optional)",
+            placeholder="e.g. ChatGPT, Gemini, Claude...",
+            key="chk_model",
+            label_visibility="collapsed",
+        )
+    with col_btn:
+        st.markdown('<div style="height: 25px;"></div>', unsafe_allow_html=True)
+        check_btn = st.button("Check with Verity →", type="primary", use_container_width=True)
 
-    # 3 Supporting Feature Cards underneath Hero (Matching Reference Image 1)
+    # 3 Distinct Feature Cards (Matching Reference Visuals)
     st.markdown(
         """
         <div class="feature-grid">
             <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <div class="feature-title">Evidence-Based</div>
-                <p class="feature-desc">We check AI claims against independently retrieved authoritative sources.</p>
+                <div class="feature-visual">
+                    <svg width="74" height="64" viewBox="0 0 74 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="37,4 68,20 37,36 6,20" fill="rgba(254, 215, 184, 0.1)" stroke="#FED7B8" stroke-width="1.2"/>
+                        <polygon points="37,16 68,32 37,48 6,32" fill="rgba(196, 85, 100, 0.15)" stroke="#E89E88" stroke-width="1.2"/>
+                        <polygon points="37,28 68,44 37,60 6,44" fill="rgba(89, 23, 27, 0.3)" stroke="#C45564" stroke-width="1.2"/>
+                        <circle cx="37" cy="20" r="4" fill="#FED7B8" filter="drop-shadow(0 0 6px #FED7B8)"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="feature-title">Evidence, not assumptions.</div>
+                    <p class="feature-desc">Verity searches for relevant evidence before assessing an AI answer.</p>
+                </div>
+                <div class="feature-card-footer">
+                    <span>01 / 03</span>
+                    <span class="feature-card-arrow">→</span>
+                </div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <div class="feature-title">Claim-Level Analysis</div>
-                <p class="feature-desc">See exactly which parts of an answer are supported, uncertain, or need attention.</p>
+                <div class="feature-visual">
+                    <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 140px;">
+                        <div style="background: rgba(34, 197, 94, 0.14); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 12px; padding: 3px 8px; font-size: 0.68rem; color: #86EFAC; font-weight: 700;">● Supported</div>
+                        <div style="background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 3px 8px; font-size: 0.68rem; color: #FED7B8; font-weight: 700;">⚠ Needs attention</div>
+                        <div style="background: rgba(225, 29, 72, 0.14); border: 1px solid rgba(225, 29, 72, 0.35); border-radius: 12px; padding: 3px 8px; font-size: 0.68rem; color: #FDA4AF; font-weight: 700;">✕ Contradicted</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="feature-title">Every claim gets checked.</div>
+                    <p class="feature-desc">See exactly which parts of an answer are supported, uncertain, or contradicted.</p>
+                </div>
+                <div class="feature-card-footer">
+                    <span>02 / 03</span>
+                    <span class="feature-card-arrow">→</span>
+                </div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🌐</div>
-                <div class="feature-title">Source Transparency</div>
-                <p class="feature-desc">Inspect the actual sources used to verify the answer with direct clickable links.</p>
+                <div class="feature-visual">
+                    <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="8" width="40" height="48" rx="6" fill="rgba(89, 23, 27, 0.4)" stroke="#A84252" stroke-width="1.2"/>
+                        <rect x="22" y="4" width="42" height="50" rx="6" fill="rgba(196, 85, 100, 0.2)" stroke="#E89E88" stroke-width="1.2"/>
+                        <rect x="36" y="10" width="40" height="46" rx="6" fill="rgba(254, 215, 184, 0.12)" stroke="#FED7B8" stroke-width="1.2"/>
+                        <circle cx="56" cy="30" r="6" fill="none" stroke="#FED7B8" stroke-width="1.5"/>
+                        <path d="M53 30H59M56 27V33" stroke="#FED7B8" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="feature-title">Know where the answer comes from.</div>
+                    <p class="feature-desc">See the sources Verity actually used to verify the answer.</p>
+                </div>
+                <div class="feature-card-footer">
+                    <span>03 / 03</span>
+                    <span class="feature-card-arrow">→</span>
+                </div>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Handling Action
+    # "From AI Answer to Evidence" Section
+    st.markdown(
+        """
+        <div class="process-section">
+            <div class="process-header-grid">
+                <div>
+                    <h2 class="process-main-heading">
+                        From AI Answer<br>to <span class="gradient-text">Evidence.</span>
+                    </h2>
+                </div>
+                <div>
+                    <p class="process-subtext">
+                        Verity follows a simple process to help you understand what's real, what's uncertain, and what's not.
+                    </p>
+                    <div class="process-learn-more">✦ LEARN MORE →</div>
+                </div>
+            </div>
+            <div class="process-steps-grid">
+                <div class="process-step-card">
+                    <div class="step-badge">
+                        <span class="step-number">01</span>
+                        <div class="step-icon">🔍</div>
+                    </div>
+                    <div class="step-title">Read</div>
+                    <p class="step-desc">Verity understands the question and AI response.</p>
+                </div>
+                <div class="process-step-card">
+                    <div class="step-badge">
+                        <span class="step-number">02</span>
+                        <div class="step-icon">🌐</div>
+                    </div>
+                    <div class="step-title">Investigate</div>
+                    <p class="step-desc">Verity retrieves relevant evidence and sources.</p>
+                </div>
+                <div class="process-step-card">
+                    <div class="step-badge">
+                        <span class="step-number">03</span>
+                        <div class="step-icon">✓</div>
+                    </div>
+                    <div class="step-title">Verify</div>
+                    <p class="step-desc">Claims are compared against the retrieved evidence.</p>
+                </div>
+                <div class="process-step-card">
+                    <div class="step-badge">
+                        <span class="step-number">04</span>
+                        <div class="step-icon">📄</div>
+                    </div>
+                    <div class="step-title">Explain</div>
+                    <p class="step-desc">You get a clear explanation of what holds up.</p>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Handling Checker Execution
     if check_btn:
         if not user_question.strip():
             st.error("Please enter the question you asked the AI.")
         elif not user_answer.strip():
             st.error("Please paste the AI's answer text.")
         else:
-            with st.status("Investigating AI Answer...", expanded=True) as status_box:
-                st.write("🔍 Analyzing your answer and identifying factual claims...")
+            with st.status("Verity is investigating...", expanded=True) as status_box:
+                st.write("🔍 Reading question and extracting distinct factual claims...")
                 time.sleep(0.1)
-                st.write("🌐 Finding relevant authoritative sources across the web...")
+                st.write("🌐 Retrieving authoritative evidence across verified knowledge sources...")
                 
                 resp = api(
                     "POST",
@@ -422,18 +922,26 @@ if nav_page == "Check Answer":
                 )
                 
                 if resp is not None:
-                    st.write("⚖️ Checking claims against retrieved evidence...")
+                    st.write("⚖️ Comparing claims against retrieved evidence...")
                     time.sleep(0.1)
-                    st.write("📊 Preparing your reliability report...")
-                    status_box.update(label="Investigation Complete!", state="complete", expanded=False)
+                    st.write("📊 Preparing Verity Analysis Report...")
+                    status_box.update(label="Analysis Complete!", state="complete", expanded=False)
                     st.session_state["current_analysis"] = resp.json()
 
-    # Display Analysis Report
+    # Display Verity Analysis Report
     if "current_analysis" in st.session_state:
         rep = st.session_state["current_analysis"]
 
         st.markdown("---")
-        st.markdown("## AI Answer Analysis")
+        st.markdown(
+            """
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 0.8rem; font-weight: 800; letter-spacing: 0.14em; color: #FED7B8; text-transform: uppercase;">VERITY ANALYSIS</div>
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Here's what the evidence tells us.</h2>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         # Question & Answer Cards
         q_display = rep.get("question", "").replace("<", "&lt;").replace(">", "&gt;")
@@ -445,8 +953,8 @@ if nav_page == "Check Answer":
             st.markdown(
                 f"""
                 <div class="q-and-a-card">
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #FED7B8; text-transform: uppercase; letter-spacing: 0.06em;">Your Question</div>
-                    <div style="color: #FFFFFF; font-size: 1.02rem; font-weight: 600; margin-top: 4px;">{q_display}</div>
+                    <div style="font-size: 0.76rem; font-weight: 800; color: #FED7B8; text-transform: uppercase; letter-spacing: 0.08em;">Your Question</div>
+                    <div style="color: #FFFFFF; font-size: 1.04rem; font-weight: 600; margin-top: 6px;">{q_display}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -455,20 +963,20 @@ if nav_page == "Check Answer":
             st.markdown(
                 f"""
                 <div class="q-and-a-card">
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #FED7B8; text-transform: uppercase; letter-spacing: 0.06em;">AI's Answer ({model_display})</div>
-                    <div style="color: #FFF5EE; font-size: 0.98rem; margin-top: 4px;">{a_display}</div>
+                    <div style="font-size: 0.76rem; font-weight: 800; color: #FED7B8; text-transform: uppercase; letter-spacing: 0.08em;">AI's Answer ({model_display})</div>
+                    <div style="color: #FFF5EE; font-size: 0.98rem; margin-top: 6px; line-height: 1.5;">{a_display}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
-        # Plain-English Summary Box (What We Found)
+        # What Verity Found
         st.markdown(
             f"""
             <div class="report-card">
-                <div style="font-size: 0.8rem; color: #FED7B8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;">What We Found</div>
-                <h3 style="color: #FFFFFF; margin: 6px 0 10px 0; font-size: 1.35rem;">{rep['overall_assessment']}</h3>
-                <p style="color: #FFF5EE; font-size: 1.02rem; line-height: 1.55; margin: 0;">{rep['summary']}</p>
+                <div style="font-size: 0.8rem; color: #FED7B8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;">What Verity Found</div>
+                <h3 style="color: #FFFFFF; margin: 8px 0 10px 0; font-size: 1.4rem;">{rep['overall_assessment']}</h3>
+                <p style="color: #FFF5EE; font-size: 1.02rem; line-height: 1.6; margin: 0;">{rep['summary']}</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -478,7 +986,12 @@ if nav_page == "Check Answer":
         sources_used = rep.get("sources_used", [])
 
         # Claim-by-Claim Breakdown
-        st.markdown("### Claim-by-Claim Analysis")
+        st.markdown(
+            """
+            <h3 style="font-size: 1.45rem; font-weight: 700; color: #FFFFFF; margin: 28px 0 14px 0;">Claim-by-Claim Analysis</h3>
+            """,
+            unsafe_allow_html=True,
+        )
         if not claims:
             st.info("No distinct claim statements were identified in the answer.")
         else:
@@ -489,7 +1002,7 @@ if nav_page == "Check Answer":
                     badge_html = '<span class="badge badge-supported">✓ SUPPORTED</span>'
                 elif st_key == "contradicted":
                     card_class = "claim-card-contradicted"
-                    badge_html = '<span class="badge badge-contradicted">✕ CONFLICTING EVIDENCE</span>'
+                    badge_html = '<span class="badge badge-contradicted">✕ CONFLICTS WITH EVIDENCE</span>'
                 elif st_key == "partially_supported":
                     card_class = "claim-card-partial"
                     badge_html = '<span class="badge badge-partial">⚠ NEEDS ATTENTION</span>'
@@ -501,15 +1014,15 @@ if nav_page == "Check Answer":
                 if claim.get("source_url"):
                     source_title = claim.get("source_title") or claim.get("source_domain") or "Verified Source"
                     source_link_html = f"""
-                    <div style="margin-top: 8px; font-size: 0.88rem;">
-                        <strong style="color: #FED7B8;">Source:</strong> <a href="{claim['source_url']}" target="_blank" style="color: #FED7B8; text-decoration: none;">{source_title} ↗</a>
+                    <div style="margin-top: 10px; font-size: 0.88rem;">
+                        <strong style="color: #FED7B8;">Evidence Source:</strong> <a href="{claim['source_url']}" target="_blank" style="color: #FED7B8; text-decoration: none;">{source_title} ↗</a>
                     </div>
                     """
 
                 evidence_html = ""
                 if claim.get("evidence_excerpt"):
                     evidence_html = f"""
-                    <div style="background: rgba(0,0,0,0.3); border-left: 2px solid #FED7B8; padding: 6px 12px; margin: 6px 0; font-size: 0.9rem; color: #E8C9B8;">
+                    <div style="background: rgba(0,0,0,0.35); border-left: 2px solid #FED7B8; padding: 8px 14px; margin: 8px 0; font-size: 0.92rem; color: #E8C9B8;">
                         <em>"{claim['evidence_excerpt']}"</em>
                     </div>
                     """
@@ -518,8 +1031,8 @@ if nav_page == "Check Answer":
                     f"""
                     <div class="claim-card {card_class}">
                         {badge_html}
-                        <div style="font-size: 1.02rem; font-weight: 600; color: #FFFFFF; margin: 2px 0 6px 0;">Claim {idx+1:02d}: "{claim['claim_text']}"</div>
-                        <div style="color: #FFF5EE; font-size: 0.95rem;"><strong>Why:</strong> {claim['explanation']}</div>
+                        <div style="font-size: 1.04rem; font-weight: 600; color: #FFFFFF; margin: 4px 0 8px 0;">Claim {idx+1:02d}: "{claim['claim_text']}"</div>
+                        <div style="color: #FFF5EE; font-size: 0.96rem; line-height: 1.5;"><strong>Finding:</strong> {claim['explanation']}</div>
                         {evidence_html}
                         {source_link_html}
                     </div>
@@ -528,7 +1041,12 @@ if nav_page == "Check Answer":
                 )
 
         # Sources Used Section
-        st.markdown("### Sources Used")
+        st.markdown(
+            """
+            <h3 style="font-size: 1.45rem; font-weight: 700; color: #FFFFFF; margin: 28px 0 14px 0;">Evidence Verity Used</h3>
+            """,
+            unsafe_allow_html=True,
+        )
         if not sources_used:
             st.caption("No external sources were retrieved for this query.")
         else:
@@ -536,9 +1054,9 @@ if nav_page == "Check Answer":
                 st.markdown(
                     f"""
                     <div class="source-card">
-                        <div style="font-weight: 700; color: #FFFFFF; font-size: 1.02rem;">{s['title']}</div>
+                        <div style="font-weight: 700; color: #FFFFFF; font-size: 1.04rem;">{s['title']}</div>
                         <div style="color: #D6ADA0; font-size: 0.82rem; margin: 2px 0 6px 0;">{s['domain']} • {s['source_type'].replace('_', ' ').title()}</div>
-                        <div style="color: #FFF5EE; font-size: 0.92rem; margin-bottom: 8px;">{s['snippet']}</div>
+                        <div style="color: #FFF5EE; font-size: 0.94rem; margin-bottom: 8px; line-height: 1.45;">{s['snippet']}</div>
                         <a href="{s['url']}" target="_blank" class="source-title">View Source →</a>
                     </div>
                     """,
@@ -549,9 +1067,9 @@ if nav_page == "Check Answer":
         st.markdown("---")
         st.markdown(
             """
-            <div style="background: rgba(30, 9, 13, 0.6); border: 1px solid rgba(254, 215, 184, 0.15); border-radius: 12px; padding: 18px 22px; margin: 18px 0 12px 0;">
-                <div style="font-weight: 700; color: #FFFFFF; font-size: 1.05rem;">Keep this analysis</div>
-                <div style="color: #D6ADA0; font-size: 0.88rem; margin-top: 2px;">Download a complete, publication-quality copy of this AI reliability analysis and verified sources.</div>
+            <div style="background: rgba(30, 9, 13, 0.65); border: 1px solid rgba(254, 215, 184, 0.16); border-radius: 14px; padding: 20px 24px; margin: 20px 0 14px 0;">
+                <div style="font-weight: 700; color: #FFFFFF; font-size: 1.1rem;">Download Your Verity Report</div>
+                <div style="color: #D6ADA0; font-size: 0.9rem; margin-top: 3px;">Keep a complete copy of this analysis, evidence and findings in a publication-ready document.</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -562,20 +1080,20 @@ if nav_page == "Check Answer":
             st.download_button(
                 "↓ Download Report",
                 data=pdf_resp.content,
-                file_name=f"ai_reliability_report_{rep.get('id', 'report')[:8]}.pdf",
+                file_name=f"verity_ai_report_{rep.get('id', 'report')[:8]}.pdf",
                 mime="application/pdf",
                 use_container_width=False,
             )
 
         # Methodology Explanation (Collapsed by default)
-        with st.expander("How we checked this ▾", expanded=False):
+        with st.expander("How Verity checked this ▾", expanded=False):
             st.markdown(
                 """
-                The platform evaluated this answer using an autonomous investigation workflow:
+                Verity AI evaluates answers using an autonomous investigation workflow:
                 - **Factual Grounding**: Verified specific entities, dates, and statements against independent web and encyclopedic sources.
-                - **Contradiction Detection**: Cross-referenced numerical assertions and years to flag factual conflicts.
+                - **Contradiction Detection**: Cross-referenced numerical assertions and dates to flag factual conflicts.
                 - **Multi-Dimensional Reliability**: Evaluated claim-evidence alignment, consistency, citation validity, and safety.
-                - **Source Authority**: Prioritized official documentation, government domains, and recognized encyclopedias.
+                - **Source Authority**: Prioritized official documentation, recognized encyclopedias, and primary domains.
                 """
             )
             if rep.get("reliability_dimensions"):
@@ -590,9 +1108,10 @@ if nav_page == "Check Answer":
 elif nav_page == "History":
     st.markdown(
         """
-        <div class="hero-container">
-            <h1 class="hero-heading">Analysis <span class="gradient-text">History</span></h1>
-            <p class="hero-subtext">Review previous AI answer reliability investigations.</p>
+        <div class="hero-wrapper" style="padding-bottom: 10px;">
+            <div class="hero-eyebrow">VERITY AI</div>
+            <h1 class="hero-main-title">Analysis <span class="gradient-text">History</span></h1>
+            <p class="hero-description">Review previous AI answer reliability investigations.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -685,9 +1204,10 @@ elif nav_page == "History":
 elif nav_page == "Advanced":
     st.markdown(
         """
-        <div class="hero-container" style="padding-bottom: 12px;">
-            <h1 class="hero-heading">Advanced <span class="gradient-text">/ Research Mode</span></h1>
-            <p class="hero-subtext">Low-level evaluator diagnostics, document ingestion, paired method comparisons, benchmark suites, and exports.</p>
+        <div class="hero-wrapper" style="padding-bottom: 10px;">
+            <div class="hero-eyebrow">VERITY AI</div>
+            <h1 class="hero-main-title">Advanced <span class="gradient-text">/ Research Mode</span></h1>
+            <p class="hero-description">Low-level evaluator diagnostics, document ingestion, paired method comparisons, benchmark suites, and exports.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -797,30 +1317,15 @@ elif nav_page == "Advanced":
                     for report in experiment["reports"]
                     for result in report["results"]
                 ]
-                st.dataframe(
-                    pd.DataFrame(rows)[
-                        [
-                            "record_id",
-                            "evaluator_id",
-                            "method",
-                            "status",
-                            "score",
-                            "measurements",
-                            "explanation",
-                            "limitations",
-                        ]
-                    ],
-                    hide_index=True,
-                )
+                st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
-                # Detailed Evaluator Result Cards
-                with st.expander("🔍 Structured Evaluator Results & Findings", expanded=True):
+                # Detailed Card View for Each Evaluator Result
+                with st.expander("🔍 Detailed Record-Level Evaluator Results", expanded=False):
                     for report in experiment["reports"]:
-                        st.markdown(f"### Record: `{report['record_id']}`")
-                        st.caption(f"Evaluation execution latency: `{report['evaluation_latency_ms']:.2f} ms`")
+                        st.markdown(f"### Record ID: `{report['record_id']}`")
                         for result in report["results"]:
-                            status = result["status"]
                             eval_id = result["evaluator_id"]
+                            status = result["status"]
                             score = result.get("score")
 
                             if status == "completed":
@@ -834,8 +1339,8 @@ elif nav_page == "Advanced":
                                 score_info = "*Execution failed*"
 
                             st.markdown(f"**Evaluator:** `{eval_id}` — {status_badge} — {score_info}")
-                            st.markdown(f"- **Method:** `{result['method']}`")
-                            st.markdown(f"- **Explanation:** {result['explanation']}")
+                            st.write(f"- **Method:** `{result['method']}`")
+                            st.write(f"- **Explanation:** {result['explanation']}")
                             if result.get("limitations"):
                                 st.caption(f"Limitations: {result['limitations']}")
 
@@ -875,73 +1380,92 @@ elif nav_page == "Advanced":
         st.markdown("---")
         st.markdown("### Paired Method Comparison")
         if len(items) >= 2:
-            left = st.selectbox("Baseline Experiment", list(labels), format_func=labels.get, key="comp_left")
-            right = st.selectbox(
-                "Candidate Experiment",
-                [k for k in labels if k != left],
-                format_func=labels.get,
-                key="comp_right",
-            )
+            left_id = st.selectbox("Left Experiment (Baseline)", list(labels), format_func=labels.get, key="adv_left_exp")
+            right_id = st.selectbox("Right Experiment (Candidate)", list(labels), format_func=labels.get, index=1 if len(labels) > 1 else 0, key="adv_right_exp")
             if st.button("Compare methods"):
-                compared = api("GET", f"/comparisons?left_id={left}&right_id={right}")
-                if compared is not None:
-                    comp_data = compared.json()
-                    st.json(comp_data)
+                comp_resp = api("GET", f"/comparisons?left_id={left_id}&right_id={right_id}")
+                if comp_resp is not None:
+                    comp = comp_resp.json()
+                    st.success("Comparison calculated successfully.")
+                    st.json(comp)
         else:
-            st.info("At least two experiments are required to perform a paired comparison.")
+            st.info("At least two stored experiments are required to perform a paired comparison.")
 
-    # TAB 2: DOCUMENT INGESTION
+    # TAB 2: DOCUMENT INGESTION (PDF / DOCX)
     with adv_tab2:
-        st.subheader("Document Ingestion & Chunking")
-        st.write("Upload source documents (PDF, DOCX, TXT, JSON, CSV) or ingest raw text for ground-truth reliability verification.")
+        st.subheader("Document Ingestion (PDF / DOCX Extraction)")
         render_input_form(api)
 
     # TAB 3: BENCHMARK SUITE
     with adv_tab3:
-        st.subheader("Standardized Benchmark Suite")
-        st.write("Run the canonical 27-case benchmark suite across hallucination, citation, safety, and retrieval dimensions.")
-        if st.button("▶ Run Standard Benchmark Suite", type="secondary"):
-            with st.spinner("Executing 27-case benchmark evaluation..."):
+        st.subheader("Standardized 27-Case Benchmark Suite")
+        st.caption("Standardized test fixtures across 7 core reliability dimensions. Deterministic and offline.")
+        bcol1, bcol2 = st.columns([1, 4])
+        with bcol1:
+            run_bench_btn = st.button("🚀 Run 27-Case Benchmark", key="adv_run_bench_btn")
+        if run_bench_btn:
+            with st.spinner("Executing 27 standardized benchmark cases..."):
                 bench_res = api("POST", "/benchmarks/run")
                 if bench_res is not None:
-                    bdata = bench_res.json()
-                    st.success(f"Benchmark completed successfully! Run ID: `{bdata['run_id']}`")
-                    st.metric("Benchmark Cases", bdata["total_cases"])
-                    st.dataframe(pd.DataFrame(bdata["results"]), hide_index=True)
+                    b_data = bench_res.json()
+                    st.success(f"Benchmark completed in {b_data['elapsed_seconds']:.2f}s!")
+                    st.metric("Overall Pass Rate", f"{b_data['pass_rate']*100:.1f}%", f"{b_data['passed_cases']}/{b_data['total_cases']} passed")
+                    b_rows = [
+                        {"Category": cat, "Cases": stats["total"], "Passed": stats["passed"], "Pass Rate": f"{stats['pass_rate']*100:.1f}%"}
+                        for cat, stats in b_data.get("category_breakdown", {}).items()
+                    ]
+                    st.dataframe(pd.DataFrame(b_rows), hide_index=True)
 
-    # TAB 4: EVALUATOR CATALOG
+    # TAB 4: EVALUATOR CATALOG (13 EVALUATORS)
     with adv_tab4:
-        st.subheader("Evaluator Catalog & Architecture")
+        st.subheader("Evaluator Taxonomy & Registered Specifications")
+        st.caption("13 distinct evaluators with explicit methods, inputs, outputs, and score boundaries.")
         evals_resp = api("GET", "/evaluators")
         if evals_resp is not None:
-            eval_list = evals_resp.json()
-            st.write(f"**Total Registered Evaluators:** `{len(eval_list)}`")
-            for ev in eval_list:
-                spec = ev.get("spec", ev) if isinstance(ev, dict) else {}
-                ev_id = spec.get("evaluator_id") or spec.get("id") or "evaluator"
-                ev_name = spec.get("display_name") or spec.get("name") or ev_id
-                exec_type = spec.get("execution_type")
-                method_type_label = "Deterministic / Local" if exec_type == "deterministic" else "External LLM Judge"
-                with st.expander(f"🔬 `{ev_id}` — {ev_name}"):
-                    st.markdown(f"- **Category:** `{spec.get('category', 'general')}`")
-                    st.markdown(f"- **Description:** {spec.get('description', 'N/A')}")
-                    st.markdown(f"- **Method Type:** `{method_type_label}`")
-                    st.markdown(f"- **Dependencies:** `{spec.get('dependencies', [])}`")
+            evaluators_data = evals_resp.json()
+            by_cat = defaultdict(list)
+            for item in evaluators_data:
+                spec = item["spec"]
+                cat = spec.get("category", spec.get("dimension", "Other")).title()
+                by_cat[cat].append(item)
 
-    # TAB 5: SYSTEM DIAGNOSTICS & METRICS
+            for category_name, cat_items in sorted(by_cat.items()):
+                st.markdown(f"### {category_name}")
+                for item in cat_items:
+                    spec = item["spec"]
+                    is_enabled = item["is_enabled_in_runtime"]
+                    is_judge = item["requires_external_judge"]
+                    status_str = "🟢 Enabled in runtime" if is_enabled else ("🟡 Optional (Requires External Judge — Disabled)" if is_judge else "⚪ Not assessed (Missing input or disabled method — not zero)")
+                    exec_badge = "🌐 External LLM Judge" if is_judge else "💻 Deterministic / Local"
+
+                    with st.container():
+                        st.markdown(f"**{spec['display_name']}** (`{spec['evaluator_id']}` v{spec['evaluator_version']}) — *{exec_badge}* — **{status_str}**")
+                        st.write(spec["description"])
+                        c1, c2 = st.columns(2)
+                        with c1:
+                            st.markdown(f"- **Method:** `{spec['method']}`")
+                            st.markdown(f"- **Required inputs:** {', '.join(f'`{inp}`' for inp in spec['required_inputs']) if spec['required_inputs'] else 'None'}")
+                        with c2:
+                            st.markdown(f"- **Output type:** `{spec['output_type']}`")
+                            if spec.get("score_range"):
+                                min_s, max_s = spec["score_range"]
+                                hib = " (Higher is better)" if spec.get("higher_is_better") else ""
+                                st.markdown(f"- **Score range:** `[{min_s}, {max_s}]`{hib}")
+                            else:
+                                st.markdown("- **Score:** Unscored / Heuristic / Measurements only")
+                        st.divider()
+
+    # TAB 5: SYSTEM DIAGNOSTICS & HEALTH
     with adv_tab5:
-        st.subheader("System Observability & Runtime Health")
-        mcol1, mcol2 = st.columns(2)
-        with mcol1:
-            st.markdown("#### Platform Readiness")
-            ready_resp = api("GET", "/ready")
-            if ready_resp is not None:
-                rdata = ready_resp.json()
-                st.markdown(f"- **Status:** `{rdata.get('status', 'N/A')}`")
-                st.markdown(f"- **Database:** `{rdata.get('database', 'N/A')}`")
-                st.markdown(f"- **Evaluators Loaded:** `{rdata.get('evaluators_loaded', 0)}`")
-        with mcol2:
-            st.markdown("#### Prometheus / System Metrics")
-            metrics_resp = api("GET", "/metrics")
-            if metrics_resp is not None:
-                st.text(metrics_resp.text[:1200] + "...")
+        st.subheader("System Health & Operational Diagnostics")
+        ready_resp = api("GET", "/ready")
+        metrics_resp = api("GET", "/metrics")
+        if ready_resp is not None and metrics_resp is not None:
+            r_data = ready_resp.json()
+            m_data = metrics_resp.json()
+
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("API Status", r_data.get("status", "unknown").upper())
+            c2.metric("Database", r_data.get("database", "unknown").title())
+            c3.metric("Evaluators Loaded", r_data.get("evaluators_loaded", 0))
+            c4.metric("Uptime", f"{m_data.get('process', {}).get('uptime_seconds', 0):.1f}s")
