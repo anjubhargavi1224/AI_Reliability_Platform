@@ -32,7 +32,7 @@ def test_dashboard_with_local_api(tmp_path, monkeypatch, paired):
         assert not dashboard.exception
         # Home page must be clean: text areas and check button
         assert len(dashboard.text_area) == 2
-        assert any(b.label == "⚡ CHECK AI ANSWER" for b in dashboard.button)
+        assert any(b.label == "Check AI Answer →" for b in dashboard.button)
         # Verify no technical tables appear on the home page
         assert len(dashboard.dataframe) == 0
 

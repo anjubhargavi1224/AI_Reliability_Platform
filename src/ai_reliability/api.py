@@ -38,6 +38,7 @@ from ai_reliability.benchmarks.runner import (
 from ai_reliability.metrics.collector import default_collector
 from ai_reliability.investigation.models import InvestigationRequest, InvestigationReport
 from ai_reliability.investigation.service import InvestigationService
+from ai_reliability.reporting.pdf_generator import generate_investigation_pdf
 
 logger = logging.getLogger("ai_reliability")
 _extraction_slots = BoundedSemaphore(2)
@@ -139,6 +140,16 @@ def create_app(db_path=None, config=None):
         """Autonomously investigate an AI answer against external evidence sources."""
         service = InvestigationService(config=settings)
         return service.investigate(request, store=store())
+
+    @app.post("/analyze/pdf")
+    def analyze_pdf(report: InvestigationReport):
+        """Generate a downloadable publication-quality PDF report from an investigation report."""
+        pdf_bytes = generate_investigation_pdf(report)
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="ai_reliability_report_{report.id[:8]}.pdf"'},
+        )
 
     @app.post("/documents/extract")
     async def extract(request: Request, filename: str = Query(..., min_length=1, max_length=255), role: Literal["answer", "evidence"] = Query(...)):
