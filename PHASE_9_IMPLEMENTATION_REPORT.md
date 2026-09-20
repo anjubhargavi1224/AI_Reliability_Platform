@@ -134,14 +134,23 @@ Tests added in Phase 9: +4 tests (`test_ready_endpoint`, `test_live_runtime_api_
 
 ## 14. GitHub Repository Information
 
+- **Branch**: `main`
+- **Commit Hash**: `84635dd0f17d46e1a8316692f1c01810b50d5972`
+- **Commit Message**: `Initial production-ready release`
+- **Staging & Sanitization**: Complete (zero secrets, zero `.env` files, zero cache/temp files committed).
+
 > [!IMPORTANT]
 > **NEW GITHUB REPOSITORY URL REQUIRED**
 >
 > In accordance with Step 16 of the Phase 9 instructions:
 > - No guess was made for the new repository URL.
 > - The existing repository was not modified or pushed to.
-> - Git initialization is staged and prepared locally.
-> - Awaiting the user-provided new empty GitHub repository URL to execute the clean push.
+> - Git initialization is completed locally and committed on branch `main`.
+> - Awaiting the user-provided new empty GitHub repository URL to execute:
+>   ```bash
+>   git remote add origin <NEW_EMPTY_REPO_URL>
+>   git push -u origin main
+>   ```
 
 ---
 
